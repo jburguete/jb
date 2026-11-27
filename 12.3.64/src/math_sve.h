@@ -706,7 +706,7 @@ print_vfloat64_t (FILE *file, const char *label, svfloat64_t x, const size_t vl)
  * Function to calculate the additive inverse value of a svfloat32_t vector.
  */
 static inline svfloat32_t
-jbm_nxf32_opposite (svbool_t pg,        ///< predicate.
+jbm_nxf32_opposite (const svbool_t pg,  ///< predicate.
                     const svfloat32_t x)        ///< svfloat32_t vector.
 {
   return svneg_f32_x (pg, x);
@@ -717,7 +717,7 @@ jbm_nxf32_opposite (svbool_t pg,        ///< predicate.
  * vector.
  */
 static inline svfloat32_t
-jbm_nxf32_reciprocal (svbool_t pg,      ///< predicate.
+jbm_nxf32_reciprocal (const svbool_t pg,      ///< predicate.
                       const svfloat32_t x)      ///< svfloat32_t vector.
 {
   return svdiv_f32_x (pg, svdup_n_f32 (1.f), x);
@@ -727,7 +727,7 @@ jbm_nxf32_reciprocal (svbool_t pg,      ///< predicate.
  * Function to calculate the absolute value of a svfloat32_t vector.
  */
 static inline svfloat32_t
-jbm_nxf32_abs (svbool_t pg,     ///< predicate.
+jbm_nxf32_abs (const svbool_t pg,     ///< predicate.
                const svfloat32_t x)     ///< svfloat32_t vector.
 {
   return svabs_f32_x (pg, x);
@@ -752,7 +752,7 @@ jbm_nxf32_copysign (const svfloat32_t x,
  * Function to calculate the hypot function (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_hypot (svbool_t pg,   ///< predicate.
+jbm_nxf32_hypot (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x,   ///< 1st svfloat32_t vector.
                  const svfloat32_t y)   ///< 2nd svfloat32_t vector.
 {
@@ -765,7 +765,7 @@ jbm_nxf32_hypot (svbool_t pg,   ///< predicate.
  * Function to rounding to nearest (svfloat32_t).
  */
 static inline svint32_t
-jbm_nxf32_round (svbool_t pg,   ///< predicate.
+jbm_nxf32_round (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return svcvt_s32_f32_x (pg, svrintn_f32_x (pg, x));
@@ -775,7 +775,7 @@ jbm_nxf32_round (svbool_t pg,   ///< predicate.
  * Function to rounding towards zero (svfloat32_t).
  */
 static inline svint32_t
-jbm_nxf32_trunc (svbool_t pg,   ///< predicate.
+jbm_nxf32_trunc (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return svcvt_s32_f32_x (pg, svrintz_f32_x (pg, x));
@@ -785,7 +785,7 @@ jbm_nxf32_trunc (svbool_t pg,   ///< predicate.
  * Function to rounding down (svfloat32_t).
  */
 static inline svint32_t
-jbm_nxf32_floor (svbool_t pg,   ///< predicate.
+jbm_nxf32_floor (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return svcvt_s32_f32_x (pg, svrintm_f32_x (pg, x));
@@ -795,7 +795,7 @@ jbm_nxf32_floor (svbool_t pg,   ///< predicate.
  * Function to rounding top (svfloat32_t).
  */
 static inline svint32_t
-jbm_nxf32_ceil (svbool_t pg,    ///< predicate.
+jbm_nxf32_ceil (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x)    ///< svfloat32_t vector.
 {
   return svcvt_s32_f32_x (pg, svrintp_f32_x (pg, x));
@@ -805,7 +805,7 @@ jbm_nxf32_ceil (svbool_t pg,    ///< predicate.
  * Function to calculate the rest of a division (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_mod (svbool_t pg,     ///< predicate.
+jbm_nxf32_mod (const svbool_t pg,     ///< predicate.
                const svfloat32_t x,     ///< dividend (svfloat32_t).
                const svfloat32_t d)     ///< divisor (svfloat32_t).
 {
@@ -818,7 +818,7 @@ jbm_nxf32_mod (svbool_t pg,     ///< predicate.
  * Function to calculate the rest of a division by a float (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_mod1 (svbool_t pg,    ///< predicate.
+jbm_nxf32_mod1 (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x,    ///< dividend (svfloat32_t).
                 const float d)  ///< divisor (double).
 {
@@ -834,7 +834,7 @@ jbm_nxf32_mod1 (svbool_t pg,    ///< predicate.
  * \return normalized fraction value in [1/2,1) (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_frexp (svbool_t pg,   ///< predicate.
+jbm_nxf32_frexp (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x,   ///< svfloat32_t vector.
                  svint32_t *e)  ///< pointer to the exponents vector.
 {
@@ -876,7 +876,7 @@ jbm_nxf32_frexp (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_exp2n (svbool_t pg,   ///< predicate.
+jbm_nxf32_exp2n (const svbool_t pg,   ///< predicate.
                  const svint32_t e)     ///< exponent vector (svint32_t).
 {
   return svscale_f32_x (pg, svdup_n_f32 (1.f), e);
@@ -888,7 +888,7 @@ jbm_nxf32_exp2n (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_ldexp (svbool_t pg,   ///< predicate.
+jbm_nxf32_ldexp (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x,   ///< svfloat32_t vector.
                  svint32_t e)   ///< exponent vector (svint32_t).
 {
@@ -901,7 +901,7 @@ jbm_nxf32_ldexp (svbool_t pg,   ///< predicate.
  * \return predicate true on small numbers.
  */
 static inline svbool_t
-jbm_nxf32_small (svbool_t pg,   ///< predicate.
+jbm_nxf32_small (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return svcmplt_n_f32 (pg, svabs_f32_x (pg, x), FLT_EPSILON);
@@ -919,7 +919,7 @@ jbm_nxf32_small (svbool_t pg,   ///< predicate.
  * \return modmin svfloat32_t vector.
  */
 static inline svfloat32_t
-jbm_nxf32_modmin (svbool_t pg,  ///< predicate.
+jbm_nxf32_modmin (const svbool_t pg,  ///< predicate.
                   const svfloat32_t a,  ///< 1st svfloat32_t vector.
                   const svfloat32_t b)  ///< 2nd svfloat32_t vector.
 {
@@ -947,7 +947,7 @@ jbm_nxf32_change (svfloat32_t *restrict a,      ///< 1st vector pointer.
  * \return svfloat32_t double.
  */
 static inline svfloat32_t
-jbm_nxf32_dbl (svbool_t pg,     ///< predicate.
+jbm_nxf32_dbl (const svbool_t pg,     ///< predicate.
                const svfloat32_t x)     ///< svfloat32_t vector.
 {
   return svadd_f32_x (pg, x, x);
@@ -959,7 +959,7 @@ jbm_nxf32_dbl (svbool_t pg,     ///< predicate.
  * \return svfloat32_t vector square.
  */
 static inline svfloat32_t
-jbm_nxf32_sqr (svbool_t pg,     ///< predicate.
+jbm_nxf32_sqr (const svbool_t pg,     ///< predicate.
                const svfloat32_t x)     ///< svfloat32_t vector.
 {
   return svmul_f32_x (pg, x, x);
@@ -972,7 +972,7 @@ jbm_nxf32_sqr (svbool_t pg,     ///< predicate.
  * \return svfloat32_t vector of y-coordinates of the extrapolated points.
  */
 static inline svfloat32_t
-jbm_nxf32_extrapolate (svbool_t pg,     ///< predicate.
+jbm_nxf32_extrapolate (const svbool_t pg,     ///< predicate.
                        const svfloat32_t x,     ///< x-coord. of points.
                        const svfloat32_t x1,    ///< x-coord. of 1st points.
                        const svfloat32_t x2,    ///< x-coord. of 2nd points.
@@ -992,7 +992,7 @@ jbm_nxf32_extrapolate (svbool_t pg,     ///< predicate.
  * \return svfloat32_t vector of y-coordinates of the interpolated points.
  */
 static inline svfloat32_t
-jbm_nxf32_interpolate (svbool_t pg,     ///< predicate.
+jbm_nxf32_interpolate (const svbool_t pg,     ///< predicate.
                        const svfloat32_t x,     ///< x-coord. of points.
                        const svfloat32_t x1,    ///< x-coord. of 1st points.
                        const svfloat32_t x2,    ///< x-coord. of 2nd points.
@@ -1010,7 +1010,7 @@ jbm_nxf32_interpolate (svbool_t pg,     ///< predicate.
  * \return svfloat32_t vector of segment lengths.
  */
 static inline svfloat32_t
-jbm_nxf32_v2_length (svbool_t pg,       ///< predicate.
+jbm_nxf32_v2_length (const svbool_t pg,       ///< predicate.
                      const svfloat32_t x1,      ///< x-coord. of 1st points.
                      const svfloat32_t y1,      ///< y-coord. of 1st points.
                      const svfloat32_t x2,      ///< x-coord. of 2nd points.
@@ -1026,7 +1026,7 @@ jbm_nxf32_v2_length (svbool_t pg,       ///< predicate.
  * \return svfloat32_t vector of segment lengths.
  */
 static inline svfloat32_t
-jbm_nxf32_v3_length (svbool_t pg,       ///< predicate.
+jbm_nxf32_v3_length (const svbool_t pg,       ///< predicate.
                      const svfloat32_t x1,      ///< x-coord. of 1st points.
                      const svfloat32_t y1,      ///< y-coord. of 1st points.
                      const svfloat32_t z1,      ///< z-coord. of 1st points.
@@ -1047,7 +1047,7 @@ jbm_nxf32_v3_length (svbool_t pg,       ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_1 (svbool_t pg,    ///< predicate.
+jbm_nxf32_polynomial_1 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1060,7 +1060,7 @@ jbm_nxf32_polynomial_1 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_2 (svbool_t pg,    ///< predicate.
+jbm_nxf32_polynomial_2 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1074,7 +1074,7 @@ jbm_nxf32_polynomial_2 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_3 (svbool_t pg,    ///< predicate.
+jbm_nxf32_polynomial_3 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1088,7 +1088,7 @@ jbm_nxf32_polynomial_3 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_4 (svbool_t pg,    ///< predicate.
+jbm_nxf32_polynomial_4 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1102,7 +1102,7 @@ jbm_nxf32_polynomial_4 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_5 (svbool_t pg,    ///< predicate.
+jbm_nxf32_polynomial_5 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1116,7 +1116,7 @@ jbm_nxf32_polynomial_5 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_6 (svbool_t pg,    ///< predicate.
+jbm_nxf32_polynomial_6 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1130,7 +1130,7 @@ jbm_nxf32_polynomial_6 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_7 (svbool_t pg,    ///< predicate.
+jbm_nxf32_polynomial_7 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1144,7 +1144,7 @@ jbm_nxf32_polynomial_7 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_8 (svbool_t pg,    ///< predicate.
+jbm_nxf32_polynomial_8 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1158,7 +1158,7 @@ jbm_nxf32_polynomial_8 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_9 (svbool_t pg,    ///< predicate.
+jbm_nxf32_polynomial_9 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1172,7 +1172,7 @@ jbm_nxf32_polynomial_9 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_10 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_10 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1186,7 +1186,7 @@ jbm_nxf32_polynomial_10 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_11 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_11 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1200,7 +1200,7 @@ jbm_nxf32_polynomial_11 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_12 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_12 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1214,7 +1214,7 @@ jbm_nxf32_polynomial_12 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_13 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_13 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1228,7 +1228,7 @@ jbm_nxf32_polynomial_13 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_14 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_14 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1242,7 +1242,7 @@ jbm_nxf32_polynomial_14 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_15 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_15 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1256,7 +1256,7 @@ jbm_nxf32_polynomial_15 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_16 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_16 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1270,7 +1270,7 @@ jbm_nxf32_polynomial_16 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_17 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_17 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1284,7 +1284,7 @@ jbm_nxf32_polynomial_17 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_18 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_18 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1298,7 +1298,7 @@ jbm_nxf32_polynomial_18 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_19 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_19 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1312,7 +1312,7 @@ jbm_nxf32_polynomial_19 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_20 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_20 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1326,7 +1326,7 @@ jbm_nxf32_polynomial_20 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_21 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_21 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1340,7 +1340,7 @@ jbm_nxf32_polynomial_21 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_22 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_22 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1354,7 +1354,7 @@ jbm_nxf32_polynomial_22 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_23 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_23 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1368,7 +1368,7 @@ jbm_nxf32_polynomial_23 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_24 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_24 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1382,7 +1382,7 @@ jbm_nxf32_polynomial_24 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_25 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_25 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1396,7 +1396,7 @@ jbm_nxf32_polynomial_25 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_26 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_26 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1410,7 +1410,7 @@ jbm_nxf32_polynomial_26 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_27 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_27 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1424,7 +1424,7 @@ jbm_nxf32_polynomial_27 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_28 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_28 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1438,7 +1438,7 @@ jbm_nxf32_polynomial_28 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of polynomial values.
  */
 static inline svfloat32_t
-jbm_nxf32_polynomial_29 (svbool_t pg,   ///< predicate.
+jbm_nxf32_polynomial_29 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -1452,7 +1452,7 @@ jbm_nxf32_polynomial_29 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_1_0 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_1_0 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1467,7 +1467,7 @@ jbm_nxf32_rational_1_0 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_2_0 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_2_0 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1483,7 +1483,7 @@ jbm_nxf32_rational_2_0 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_2_1 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_2_1 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1498,7 +1498,7 @@ jbm_nxf32_rational_2_1 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_3_0 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_3_0 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1514,7 +1514,7 @@ jbm_nxf32_rational_3_0 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_3_1 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_3_1 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1530,7 +1530,7 @@ jbm_nxf32_rational_3_1 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_3_2 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_3_2 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1545,7 +1545,7 @@ jbm_nxf32_rational_3_2 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_4_0 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_4_0 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1561,7 +1561,7 @@ jbm_nxf32_rational_4_0 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_4_1 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_4_1 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1577,7 +1577,7 @@ jbm_nxf32_rational_4_1 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_4_2 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_4_2 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1593,7 +1593,7 @@ jbm_nxf32_rational_4_2 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_4_3 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_4_3 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1608,7 +1608,7 @@ jbm_nxf32_rational_4_3 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_5_0 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_5_0 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1624,7 +1624,7 @@ jbm_nxf32_rational_5_0 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_5_1 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_5_1 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1640,7 +1640,7 @@ jbm_nxf32_rational_5_1 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_5_2 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_5_2 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1656,7 +1656,7 @@ jbm_nxf32_rational_5_2 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_5_3 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_5_3 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1672,7 +1672,7 @@ jbm_nxf32_rational_5_3 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_5_4 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_5_4 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1687,7 +1687,7 @@ jbm_nxf32_rational_5_4 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_6_0 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_6_0 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1703,7 +1703,7 @@ jbm_nxf32_rational_6_0 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_6_1 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_6_1 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1719,7 +1719,7 @@ jbm_nxf32_rational_6_1 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_6_2 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_6_2 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1735,7 +1735,7 @@ jbm_nxf32_rational_6_2 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_6_3 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_6_3 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1751,7 +1751,7 @@ jbm_nxf32_rational_6_3 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_6_4 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_6_4 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1767,7 +1767,7 @@ jbm_nxf32_rational_6_4 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_6_5 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_6_5 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1782,7 +1782,7 @@ jbm_nxf32_rational_6_5 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_7_0 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_7_0 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1798,7 +1798,7 @@ jbm_nxf32_rational_7_0 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_7_1 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_7_1 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1814,7 +1814,7 @@ jbm_nxf32_rational_7_1 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_7_2 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_7_2 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1830,7 +1830,7 @@ jbm_nxf32_rational_7_2 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_7_3 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_7_3 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1846,7 +1846,7 @@ jbm_nxf32_rational_7_3 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_7_4 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_7_4 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1862,7 +1862,7 @@ jbm_nxf32_rational_7_4 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_7_5 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_7_5 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1878,7 +1878,7 @@ jbm_nxf32_rational_7_5 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_7_6 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_7_6 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1893,7 +1893,7 @@ jbm_nxf32_rational_7_6 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_8_0 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_8_0 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1909,7 +1909,7 @@ jbm_nxf32_rational_8_0 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_8_1 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_8_1 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1925,7 +1925,7 @@ jbm_nxf32_rational_8_1 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_8_2 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_8_2 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1941,7 +1941,7 @@ jbm_nxf32_rational_8_2 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_8_3 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_8_3 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1957,7 +1957,7 @@ jbm_nxf32_rational_8_3 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_8_4 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_8_4 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1973,7 +1973,7 @@ jbm_nxf32_rational_8_4 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_8_5 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_8_5 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -1989,7 +1989,7 @@ jbm_nxf32_rational_8_5 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_8_6 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_8_6 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -2005,7 +2005,7 @@ jbm_nxf32_rational_8_6 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_8_7 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_8_7 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -2020,7 +2020,7 @@ jbm_nxf32_rational_8_7 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_9_0 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_9_0 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -2036,7 +2036,7 @@ jbm_nxf32_rational_9_0 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_9_1 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_9_1 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -2052,7 +2052,7 @@ jbm_nxf32_rational_9_1 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_9_2 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_9_2 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -2068,7 +2068,7 @@ jbm_nxf32_rational_9_2 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_9_3 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_9_3 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -2084,7 +2084,7 @@ jbm_nxf32_rational_9_3 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_9_4 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_9_4 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -2100,7 +2100,7 @@ jbm_nxf32_rational_9_4 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_9_5 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_9_5 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -2116,7 +2116,7 @@ jbm_nxf32_rational_9_5 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_9_6 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_9_6 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -2132,7 +2132,7 @@ jbm_nxf32_rational_9_6 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_9_7 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_9_7 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -2148,7 +2148,7 @@ jbm_nxf32_rational_9_7 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_9_8 (svbool_t pg,    ///< predicate.
+jbm_nxf32_rational_9_8 (const svbool_t pg,    ///< predicate.
                         const svfloat32_t x,    ///< svfloat32_t vector.
                         const float *p) ///< array of coefficients.
 {
@@ -2163,7 +2163,7 @@ jbm_nxf32_rational_9_8 (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_10_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_10_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2179,7 +2179,7 @@ jbm_nxf32_rational_10_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_10_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_10_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2195,7 +2195,7 @@ jbm_nxf32_rational_10_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_10_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_10_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2211,7 +2211,7 @@ jbm_nxf32_rational_10_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_10_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_10_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2227,7 +2227,7 @@ jbm_nxf32_rational_10_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_10_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_10_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2243,7 +2243,7 @@ jbm_nxf32_rational_10_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_10_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_10_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2259,7 +2259,7 @@ jbm_nxf32_rational_10_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_10_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_10_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2275,7 +2275,7 @@ jbm_nxf32_rational_10_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_10_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_10_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2291,7 +2291,7 @@ jbm_nxf32_rational_10_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_10_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_10_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2307,7 +2307,7 @@ jbm_nxf32_rational_10_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_10_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_10_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2322,7 +2322,7 @@ jbm_nxf32_rational_10_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_11_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_11_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2338,7 +2338,7 @@ jbm_nxf32_rational_11_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_11_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_11_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2354,7 +2354,7 @@ jbm_nxf32_rational_11_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_11_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_11_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2370,7 +2370,7 @@ jbm_nxf32_rational_11_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_11_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_11_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2386,7 +2386,7 @@ jbm_nxf32_rational_11_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_11_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_11_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2402,7 +2402,7 @@ jbm_nxf32_rational_11_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_11_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_11_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2418,7 +2418,7 @@ jbm_nxf32_rational_11_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_11_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_11_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2434,7 +2434,7 @@ jbm_nxf32_rational_11_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_11_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_11_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2450,7 +2450,7 @@ jbm_nxf32_rational_11_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_11_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_11_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2466,7 +2466,7 @@ jbm_nxf32_rational_11_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_11_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_11_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2482,7 +2482,7 @@ jbm_nxf32_rational_11_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_11_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_11_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -2497,7 +2497,7 @@ jbm_nxf32_rational_11_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_12_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2513,7 +2513,7 @@ jbm_nxf32_rational_12_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_12_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2529,7 +2529,7 @@ jbm_nxf32_rational_12_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_12_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2545,7 +2545,7 @@ jbm_nxf32_rational_12_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_12_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2561,7 +2561,7 @@ jbm_nxf32_rational_12_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_12_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2577,7 +2577,7 @@ jbm_nxf32_rational_12_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_12_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2593,7 +2593,7 @@ jbm_nxf32_rational_12_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_12_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2609,7 +2609,7 @@ jbm_nxf32_rational_12_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_12_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2625,7 +2625,7 @@ jbm_nxf32_rational_12_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_12_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2641,7 +2641,7 @@ jbm_nxf32_rational_12_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_12_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2657,7 +2657,7 @@ jbm_nxf32_rational_12_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_12_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -2673,7 +2673,7 @@ jbm_nxf32_rational_12_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_12_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_12_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -2688,7 +2688,7 @@ jbm_nxf32_rational_12_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_13_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2704,7 +2704,7 @@ jbm_nxf32_rational_13_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_13_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2720,7 +2720,7 @@ jbm_nxf32_rational_13_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_13_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2736,7 +2736,7 @@ jbm_nxf32_rational_13_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_13_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2752,7 +2752,7 @@ jbm_nxf32_rational_13_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_13_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2768,7 +2768,7 @@ jbm_nxf32_rational_13_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_13_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2784,7 +2784,7 @@ jbm_nxf32_rational_13_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_13_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2800,7 +2800,7 @@ jbm_nxf32_rational_13_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_13_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2816,7 +2816,7 @@ jbm_nxf32_rational_13_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_13_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2832,7 +2832,7 @@ jbm_nxf32_rational_13_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_13_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2848,7 +2848,7 @@ jbm_nxf32_rational_13_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_13_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -2864,7 +2864,7 @@ jbm_nxf32_rational_13_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_13_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -2880,7 +2880,7 @@ jbm_nxf32_rational_13_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_13_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_13_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -2895,7 +2895,7 @@ jbm_nxf32_rational_13_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_14_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2911,7 +2911,7 @@ jbm_nxf32_rational_14_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_14_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2927,7 +2927,7 @@ jbm_nxf32_rational_14_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_14_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2943,7 +2943,7 @@ jbm_nxf32_rational_14_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_14_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2959,7 +2959,7 @@ jbm_nxf32_rational_14_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_14_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2975,7 +2975,7 @@ jbm_nxf32_rational_14_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_14_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -2991,7 +2991,7 @@ jbm_nxf32_rational_14_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_14_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3007,7 +3007,7 @@ jbm_nxf32_rational_14_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_14_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3023,7 +3023,7 @@ jbm_nxf32_rational_14_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_14_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3039,7 +3039,7 @@ jbm_nxf32_rational_14_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_14_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3055,7 +3055,7 @@ jbm_nxf32_rational_14_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_14_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3071,7 +3071,7 @@ jbm_nxf32_rational_14_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_14_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3087,7 +3087,7 @@ jbm_nxf32_rational_14_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_14_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3103,7 +3103,7 @@ jbm_nxf32_rational_14_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_14_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_14_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3118,7 +3118,7 @@ jbm_nxf32_rational_14_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_15_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3134,7 +3134,7 @@ jbm_nxf32_rational_15_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_15_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3150,7 +3150,7 @@ jbm_nxf32_rational_15_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_15_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3166,7 +3166,7 @@ jbm_nxf32_rational_15_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_15_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3182,7 +3182,7 @@ jbm_nxf32_rational_15_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_15_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3198,7 +3198,7 @@ jbm_nxf32_rational_15_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_15_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3214,7 +3214,7 @@ jbm_nxf32_rational_15_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_15_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3230,7 +3230,7 @@ jbm_nxf32_rational_15_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_15_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3246,7 +3246,7 @@ jbm_nxf32_rational_15_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_15_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3262,7 +3262,7 @@ jbm_nxf32_rational_15_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_15_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3278,7 +3278,7 @@ jbm_nxf32_rational_15_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_15_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3294,7 +3294,7 @@ jbm_nxf32_rational_15_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_15_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3310,7 +3310,7 @@ jbm_nxf32_rational_15_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_15_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3326,7 +3326,7 @@ jbm_nxf32_rational_15_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_15_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3342,7 +3342,7 @@ jbm_nxf32_rational_15_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_15_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_15_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3357,7 +3357,7 @@ jbm_nxf32_rational_15_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_16_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3373,7 +3373,7 @@ jbm_nxf32_rational_16_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_16_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3389,7 +3389,7 @@ jbm_nxf32_rational_16_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_16_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3405,7 +3405,7 @@ jbm_nxf32_rational_16_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_16_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3421,7 +3421,7 @@ jbm_nxf32_rational_16_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_16_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3437,7 +3437,7 @@ jbm_nxf32_rational_16_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_16_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3453,7 +3453,7 @@ jbm_nxf32_rational_16_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_16_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3469,7 +3469,7 @@ jbm_nxf32_rational_16_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_16_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3485,7 +3485,7 @@ jbm_nxf32_rational_16_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_16_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3501,7 +3501,7 @@ jbm_nxf32_rational_16_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_16_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3517,7 +3517,7 @@ jbm_nxf32_rational_16_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_16_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3533,7 +3533,7 @@ jbm_nxf32_rational_16_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_16_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3549,7 +3549,7 @@ jbm_nxf32_rational_16_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_16_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3565,7 +3565,7 @@ jbm_nxf32_rational_16_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_16_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3581,7 +3581,7 @@ jbm_nxf32_rational_16_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_16_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3597,7 +3597,7 @@ jbm_nxf32_rational_16_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_16_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_16_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3612,7 +3612,7 @@ jbm_nxf32_rational_16_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_17_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3628,7 +3628,7 @@ jbm_nxf32_rational_17_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_17_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3644,7 +3644,7 @@ jbm_nxf32_rational_17_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_17_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3660,7 +3660,7 @@ jbm_nxf32_rational_17_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_17_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3676,7 +3676,7 @@ jbm_nxf32_rational_17_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_17_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3692,7 +3692,7 @@ jbm_nxf32_rational_17_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_17_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3708,7 +3708,7 @@ jbm_nxf32_rational_17_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_17_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3724,7 +3724,7 @@ jbm_nxf32_rational_17_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_17_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3740,7 +3740,7 @@ jbm_nxf32_rational_17_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_17_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3756,7 +3756,7 @@ jbm_nxf32_rational_17_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_17_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3772,7 +3772,7 @@ jbm_nxf32_rational_17_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_17_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3788,7 +3788,7 @@ jbm_nxf32_rational_17_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_17_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3804,7 +3804,7 @@ jbm_nxf32_rational_17_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_17_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3820,7 +3820,7 @@ jbm_nxf32_rational_17_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_17_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3836,7 +3836,7 @@ jbm_nxf32_rational_17_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_17_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3852,7 +3852,7 @@ jbm_nxf32_rational_17_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_17_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3868,7 +3868,7 @@ jbm_nxf32_rational_17_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_17_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_17_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -3883,7 +3883,7 @@ jbm_nxf32_rational_17_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_18_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3899,7 +3899,7 @@ jbm_nxf32_rational_18_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_18_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3915,7 +3915,7 @@ jbm_nxf32_rational_18_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_18_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3931,7 +3931,7 @@ jbm_nxf32_rational_18_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_18_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3947,7 +3947,7 @@ jbm_nxf32_rational_18_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_18_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3963,7 +3963,7 @@ jbm_nxf32_rational_18_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_18_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3979,7 +3979,7 @@ jbm_nxf32_rational_18_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_18_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -3995,7 +3995,7 @@ jbm_nxf32_rational_18_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_18_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4011,7 +4011,7 @@ jbm_nxf32_rational_18_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_18_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4027,7 +4027,7 @@ jbm_nxf32_rational_18_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_18_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4043,7 +4043,7 @@ jbm_nxf32_rational_18_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_18_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4059,7 +4059,7 @@ jbm_nxf32_rational_18_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_18_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4075,7 +4075,7 @@ jbm_nxf32_rational_18_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_18_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4091,7 +4091,7 @@ jbm_nxf32_rational_18_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_18_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4107,7 +4107,7 @@ jbm_nxf32_rational_18_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_18_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4123,7 +4123,7 @@ jbm_nxf32_rational_18_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_18_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4139,7 +4139,7 @@ jbm_nxf32_rational_18_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_18_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4155,7 +4155,7 @@ jbm_nxf32_rational_18_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_18_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_18_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4170,7 +4170,7 @@ jbm_nxf32_rational_18_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_19_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4186,7 +4186,7 @@ jbm_nxf32_rational_19_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_19_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4202,7 +4202,7 @@ jbm_nxf32_rational_19_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_19_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4218,7 +4218,7 @@ jbm_nxf32_rational_19_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_19_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4234,7 +4234,7 @@ jbm_nxf32_rational_19_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_19_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4250,7 +4250,7 @@ jbm_nxf32_rational_19_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_19_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4266,7 +4266,7 @@ jbm_nxf32_rational_19_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_19_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4282,7 +4282,7 @@ jbm_nxf32_rational_19_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_19_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4298,7 +4298,7 @@ jbm_nxf32_rational_19_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_19_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4314,7 +4314,7 @@ jbm_nxf32_rational_19_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_19_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4330,7 +4330,7 @@ jbm_nxf32_rational_19_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_19_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4346,7 +4346,7 @@ jbm_nxf32_rational_19_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_19_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4362,7 +4362,7 @@ jbm_nxf32_rational_19_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_19_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4378,7 +4378,7 @@ jbm_nxf32_rational_19_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_19_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4394,7 +4394,7 @@ jbm_nxf32_rational_19_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_19_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4410,7 +4410,7 @@ jbm_nxf32_rational_19_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_19_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4426,7 +4426,7 @@ jbm_nxf32_rational_19_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_19_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4442,7 +4442,7 @@ jbm_nxf32_rational_19_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_19_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4458,7 +4458,7 @@ jbm_nxf32_rational_19_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_19_18 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_19_18 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4473,7 +4473,7 @@ jbm_nxf32_rational_19_18 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_20_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4489,7 +4489,7 @@ jbm_nxf32_rational_20_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_20_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4505,7 +4505,7 @@ jbm_nxf32_rational_20_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_20_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4521,7 +4521,7 @@ jbm_nxf32_rational_20_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_20_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4537,7 +4537,7 @@ jbm_nxf32_rational_20_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_20_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4553,7 +4553,7 @@ jbm_nxf32_rational_20_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_20_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4569,7 +4569,7 @@ jbm_nxf32_rational_20_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_20_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4585,7 +4585,7 @@ jbm_nxf32_rational_20_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_20_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4601,7 +4601,7 @@ jbm_nxf32_rational_20_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_20_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4617,7 +4617,7 @@ jbm_nxf32_rational_20_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_20_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4633,7 +4633,7 @@ jbm_nxf32_rational_20_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_20_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4649,7 +4649,7 @@ jbm_nxf32_rational_20_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_20_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4665,7 +4665,7 @@ jbm_nxf32_rational_20_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_20_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4681,7 +4681,7 @@ jbm_nxf32_rational_20_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_20_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4697,7 +4697,7 @@ jbm_nxf32_rational_20_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_20_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4713,7 +4713,7 @@ jbm_nxf32_rational_20_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_20_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4729,7 +4729,7 @@ jbm_nxf32_rational_20_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_20_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4745,7 +4745,7 @@ jbm_nxf32_rational_20_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_20_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4761,7 +4761,7 @@ jbm_nxf32_rational_20_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_18 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_20_18 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4777,7 +4777,7 @@ jbm_nxf32_rational_20_18 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_20_19 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_20_19 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4792,7 +4792,7 @@ jbm_nxf32_rational_20_19 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_21_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4808,7 +4808,7 @@ jbm_nxf32_rational_21_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_21_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4824,7 +4824,7 @@ jbm_nxf32_rational_21_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_21_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4840,7 +4840,7 @@ jbm_nxf32_rational_21_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_21_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4856,7 +4856,7 @@ jbm_nxf32_rational_21_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_21_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4872,7 +4872,7 @@ jbm_nxf32_rational_21_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_21_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4888,7 +4888,7 @@ jbm_nxf32_rational_21_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_21_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4904,7 +4904,7 @@ jbm_nxf32_rational_21_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_21_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4920,7 +4920,7 @@ jbm_nxf32_rational_21_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_21_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4936,7 +4936,7 @@ jbm_nxf32_rational_21_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_21_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -4952,7 +4952,7 @@ jbm_nxf32_rational_21_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_21_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4968,7 +4968,7 @@ jbm_nxf32_rational_21_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_21_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -4984,7 +4984,7 @@ jbm_nxf32_rational_21_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_21_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5000,7 +5000,7 @@ jbm_nxf32_rational_21_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_21_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5016,7 +5016,7 @@ jbm_nxf32_rational_21_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_21_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5032,7 +5032,7 @@ jbm_nxf32_rational_21_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_21_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5048,7 +5048,7 @@ jbm_nxf32_rational_21_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_21_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5064,7 +5064,7 @@ jbm_nxf32_rational_21_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_21_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5080,7 +5080,7 @@ jbm_nxf32_rational_21_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_18 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_21_18 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5096,7 +5096,7 @@ jbm_nxf32_rational_21_18 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_19 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_21_19 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5112,7 +5112,7 @@ jbm_nxf32_rational_21_19 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_21_20 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_21_20 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5127,7 +5127,7 @@ jbm_nxf32_rational_21_20 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_22_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5143,7 +5143,7 @@ jbm_nxf32_rational_22_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_22_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5159,7 +5159,7 @@ jbm_nxf32_rational_22_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_22_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5175,7 +5175,7 @@ jbm_nxf32_rational_22_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_22_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5191,7 +5191,7 @@ jbm_nxf32_rational_22_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_22_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5207,7 +5207,7 @@ jbm_nxf32_rational_22_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_22_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5223,7 +5223,7 @@ jbm_nxf32_rational_22_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_22_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5239,7 +5239,7 @@ jbm_nxf32_rational_22_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_22_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5255,7 +5255,7 @@ jbm_nxf32_rational_22_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_22_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5271,7 +5271,7 @@ jbm_nxf32_rational_22_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_22_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5287,7 +5287,7 @@ jbm_nxf32_rational_22_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5303,7 +5303,7 @@ jbm_nxf32_rational_22_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5319,7 +5319,7 @@ jbm_nxf32_rational_22_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5335,7 +5335,7 @@ jbm_nxf32_rational_22_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5351,7 +5351,7 @@ jbm_nxf32_rational_22_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5367,7 +5367,7 @@ jbm_nxf32_rational_22_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5383,7 +5383,7 @@ jbm_nxf32_rational_22_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5399,7 +5399,7 @@ jbm_nxf32_rational_22_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5415,7 +5415,7 @@ jbm_nxf32_rational_22_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_18 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_18 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5431,7 +5431,7 @@ jbm_nxf32_rational_22_18 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_19 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_19 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5447,7 +5447,7 @@ jbm_nxf32_rational_22_19 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_20 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_20 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5463,7 +5463,7 @@ jbm_nxf32_rational_22_20 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_22_21 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_22_21 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5478,7 +5478,7 @@ jbm_nxf32_rational_22_21 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_23_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5494,7 +5494,7 @@ jbm_nxf32_rational_23_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_23_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5510,7 +5510,7 @@ jbm_nxf32_rational_23_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_23_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5526,7 +5526,7 @@ jbm_nxf32_rational_23_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_23_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5542,7 +5542,7 @@ jbm_nxf32_rational_23_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_23_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5558,7 +5558,7 @@ jbm_nxf32_rational_23_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_23_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5574,7 +5574,7 @@ jbm_nxf32_rational_23_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_23_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5590,7 +5590,7 @@ jbm_nxf32_rational_23_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_23_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5606,7 +5606,7 @@ jbm_nxf32_rational_23_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_23_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5622,7 +5622,7 @@ jbm_nxf32_rational_23_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_23_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5638,7 +5638,7 @@ jbm_nxf32_rational_23_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5654,7 +5654,7 @@ jbm_nxf32_rational_23_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5670,7 +5670,7 @@ jbm_nxf32_rational_23_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5686,7 +5686,7 @@ jbm_nxf32_rational_23_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5702,7 +5702,7 @@ jbm_nxf32_rational_23_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5718,7 +5718,7 @@ jbm_nxf32_rational_23_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5734,7 +5734,7 @@ jbm_nxf32_rational_23_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5750,7 +5750,7 @@ jbm_nxf32_rational_23_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5766,7 +5766,7 @@ jbm_nxf32_rational_23_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_18 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_18 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5782,7 +5782,7 @@ jbm_nxf32_rational_23_18 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_19 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_19 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5798,7 +5798,7 @@ jbm_nxf32_rational_23_19 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_20 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_20 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5814,7 +5814,7 @@ jbm_nxf32_rational_23_20 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_21 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_21 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5830,7 +5830,7 @@ jbm_nxf32_rational_23_21 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_23_22 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_23_22 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -5845,7 +5845,7 @@ jbm_nxf32_rational_23_22 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_24_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5861,7 +5861,7 @@ jbm_nxf32_rational_24_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_24_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5877,7 +5877,7 @@ jbm_nxf32_rational_24_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_24_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5893,7 +5893,7 @@ jbm_nxf32_rational_24_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_24_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5909,7 +5909,7 @@ jbm_nxf32_rational_24_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_24_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5925,7 +5925,7 @@ jbm_nxf32_rational_24_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_24_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5941,7 +5941,7 @@ jbm_nxf32_rational_24_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_24_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5957,7 +5957,7 @@ jbm_nxf32_rational_24_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_24_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5973,7 +5973,7 @@ jbm_nxf32_rational_24_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_24_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -5989,7 +5989,7 @@ jbm_nxf32_rational_24_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_24_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6005,7 +6005,7 @@ jbm_nxf32_rational_24_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6021,7 +6021,7 @@ jbm_nxf32_rational_24_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6037,7 +6037,7 @@ jbm_nxf32_rational_24_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6053,7 +6053,7 @@ jbm_nxf32_rational_24_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6069,7 +6069,7 @@ jbm_nxf32_rational_24_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6085,7 +6085,7 @@ jbm_nxf32_rational_24_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6101,7 +6101,7 @@ jbm_nxf32_rational_24_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6117,7 +6117,7 @@ jbm_nxf32_rational_24_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6133,7 +6133,7 @@ jbm_nxf32_rational_24_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_18 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_18 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6149,7 +6149,7 @@ jbm_nxf32_rational_24_18 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_19 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_19 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6165,7 +6165,7 @@ jbm_nxf32_rational_24_19 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_20 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_20 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6181,7 +6181,7 @@ jbm_nxf32_rational_24_20 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_21 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_21 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6197,7 +6197,7 @@ jbm_nxf32_rational_24_21 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_22 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_22 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6213,7 +6213,7 @@ jbm_nxf32_rational_24_22 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_24_23 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_24_23 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6228,7 +6228,7 @@ jbm_nxf32_rational_24_23 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_25_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6244,7 +6244,7 @@ jbm_nxf32_rational_25_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_25_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6260,7 +6260,7 @@ jbm_nxf32_rational_25_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_25_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6276,7 +6276,7 @@ jbm_nxf32_rational_25_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_25_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6292,7 +6292,7 @@ jbm_nxf32_rational_25_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_25_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6308,7 +6308,7 @@ jbm_nxf32_rational_25_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_25_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6324,7 +6324,7 @@ jbm_nxf32_rational_25_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_25_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6340,7 +6340,7 @@ jbm_nxf32_rational_25_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_25_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6356,7 +6356,7 @@ jbm_nxf32_rational_25_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_25_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6372,7 +6372,7 @@ jbm_nxf32_rational_25_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_25_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6388,7 +6388,7 @@ jbm_nxf32_rational_25_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6404,7 +6404,7 @@ jbm_nxf32_rational_25_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6420,7 +6420,7 @@ jbm_nxf32_rational_25_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6436,7 +6436,7 @@ jbm_nxf32_rational_25_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6452,7 +6452,7 @@ jbm_nxf32_rational_25_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6468,7 +6468,7 @@ jbm_nxf32_rational_25_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6484,7 +6484,7 @@ jbm_nxf32_rational_25_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6500,7 +6500,7 @@ jbm_nxf32_rational_25_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6516,7 +6516,7 @@ jbm_nxf32_rational_25_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_18 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_18 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6532,7 +6532,7 @@ jbm_nxf32_rational_25_18 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_19 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_19 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6548,7 +6548,7 @@ jbm_nxf32_rational_25_19 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_20 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_20 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6564,7 +6564,7 @@ jbm_nxf32_rational_25_20 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_21 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_21 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6580,7 +6580,7 @@ jbm_nxf32_rational_25_21 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_22 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_22 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6596,7 +6596,7 @@ jbm_nxf32_rational_25_22 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_23 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_23 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6612,7 +6612,7 @@ jbm_nxf32_rational_25_23 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_25_24 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_25_24 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6627,7 +6627,7 @@ jbm_nxf32_rational_25_24 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_26_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6643,7 +6643,7 @@ jbm_nxf32_rational_26_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_26_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6659,7 +6659,7 @@ jbm_nxf32_rational_26_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_26_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6675,7 +6675,7 @@ jbm_nxf32_rational_26_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_26_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6691,7 +6691,7 @@ jbm_nxf32_rational_26_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_26_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6707,7 +6707,7 @@ jbm_nxf32_rational_26_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_26_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6723,7 +6723,7 @@ jbm_nxf32_rational_26_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_26_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6739,7 +6739,7 @@ jbm_nxf32_rational_26_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_26_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6755,7 +6755,7 @@ jbm_nxf32_rational_26_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_26_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6771,7 +6771,7 @@ jbm_nxf32_rational_26_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_26_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -6787,7 +6787,7 @@ jbm_nxf32_rational_26_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6803,7 +6803,7 @@ jbm_nxf32_rational_26_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6819,7 +6819,7 @@ jbm_nxf32_rational_26_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6835,7 +6835,7 @@ jbm_nxf32_rational_26_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6851,7 +6851,7 @@ jbm_nxf32_rational_26_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6867,7 +6867,7 @@ jbm_nxf32_rational_26_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6883,7 +6883,7 @@ jbm_nxf32_rational_26_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6899,7 +6899,7 @@ jbm_nxf32_rational_26_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6915,7 +6915,7 @@ jbm_nxf32_rational_26_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_18 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_18 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6931,7 +6931,7 @@ jbm_nxf32_rational_26_18 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_19 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_19 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6947,7 +6947,7 @@ jbm_nxf32_rational_26_19 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_20 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_20 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6963,7 +6963,7 @@ jbm_nxf32_rational_26_20 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_21 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_21 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6979,7 +6979,7 @@ jbm_nxf32_rational_26_21 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_22 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_22 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -6995,7 +6995,7 @@ jbm_nxf32_rational_26_22 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_23 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_23 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7011,7 +7011,7 @@ jbm_nxf32_rational_26_23 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_24 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_24 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7027,7 +7027,7 @@ jbm_nxf32_rational_26_24 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_26_25 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_26_25 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7042,7 +7042,7 @@ jbm_nxf32_rational_26_25 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_27_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7058,7 +7058,7 @@ jbm_nxf32_rational_27_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_27_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7074,7 +7074,7 @@ jbm_nxf32_rational_27_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_27_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7090,7 +7090,7 @@ jbm_nxf32_rational_27_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_27_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7106,7 +7106,7 @@ jbm_nxf32_rational_27_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_27_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7122,7 +7122,7 @@ jbm_nxf32_rational_27_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_27_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7138,7 +7138,7 @@ jbm_nxf32_rational_27_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_27_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7154,7 +7154,7 @@ jbm_nxf32_rational_27_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_27_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7170,7 +7170,7 @@ jbm_nxf32_rational_27_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_27_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7186,7 +7186,7 @@ jbm_nxf32_rational_27_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_27_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7202,7 +7202,7 @@ jbm_nxf32_rational_27_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7218,7 +7218,7 @@ jbm_nxf32_rational_27_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7234,7 +7234,7 @@ jbm_nxf32_rational_27_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7250,7 +7250,7 @@ jbm_nxf32_rational_27_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7266,7 +7266,7 @@ jbm_nxf32_rational_27_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7282,7 +7282,7 @@ jbm_nxf32_rational_27_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7298,7 +7298,7 @@ jbm_nxf32_rational_27_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7314,7 +7314,7 @@ jbm_nxf32_rational_27_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7330,7 +7330,7 @@ jbm_nxf32_rational_27_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_18 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_18 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7346,7 +7346,7 @@ jbm_nxf32_rational_27_18 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_19 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_19 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7362,7 +7362,7 @@ jbm_nxf32_rational_27_19 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_20 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_20 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7378,7 +7378,7 @@ jbm_nxf32_rational_27_20 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_21 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_21 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7394,7 +7394,7 @@ jbm_nxf32_rational_27_21 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_22 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_22 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7410,7 +7410,7 @@ jbm_nxf32_rational_27_22 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_23 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_23 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7426,7 +7426,7 @@ jbm_nxf32_rational_27_23 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_24 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_24 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7442,7 +7442,7 @@ jbm_nxf32_rational_27_24 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_25 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_25 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7458,7 +7458,7 @@ jbm_nxf32_rational_27_25 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_27_26 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_27_26 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7473,7 +7473,7 @@ jbm_nxf32_rational_27_26 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_28_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7489,7 +7489,7 @@ jbm_nxf32_rational_28_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_28_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7505,7 +7505,7 @@ jbm_nxf32_rational_28_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_28_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7521,7 +7521,7 @@ jbm_nxf32_rational_28_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_28_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7537,7 +7537,7 @@ jbm_nxf32_rational_28_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_28_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7553,7 +7553,7 @@ jbm_nxf32_rational_28_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_28_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7569,7 +7569,7 @@ jbm_nxf32_rational_28_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_28_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7585,7 +7585,7 @@ jbm_nxf32_rational_28_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_28_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7601,7 +7601,7 @@ jbm_nxf32_rational_28_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_28_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7617,7 +7617,7 @@ jbm_nxf32_rational_28_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_28_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7633,7 +7633,7 @@ jbm_nxf32_rational_28_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7649,7 +7649,7 @@ jbm_nxf32_rational_28_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7665,7 +7665,7 @@ jbm_nxf32_rational_28_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7681,7 +7681,7 @@ jbm_nxf32_rational_28_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7697,7 +7697,7 @@ jbm_nxf32_rational_28_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7713,7 +7713,7 @@ jbm_nxf32_rational_28_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7729,7 +7729,7 @@ jbm_nxf32_rational_28_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7745,7 +7745,7 @@ jbm_nxf32_rational_28_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7761,7 +7761,7 @@ jbm_nxf32_rational_28_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_18 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_18 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7777,7 +7777,7 @@ jbm_nxf32_rational_28_18 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_19 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_19 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7793,7 +7793,7 @@ jbm_nxf32_rational_28_19 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_20 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_20 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7809,7 +7809,7 @@ jbm_nxf32_rational_28_20 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_21 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_21 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7825,7 +7825,7 @@ jbm_nxf32_rational_28_21 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_22 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_22 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7841,7 +7841,7 @@ jbm_nxf32_rational_28_22 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_23 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_23 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7857,7 +7857,7 @@ jbm_nxf32_rational_28_23 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_24 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_24 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7873,7 +7873,7 @@ jbm_nxf32_rational_28_24 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_25 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_25 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7889,7 +7889,7 @@ jbm_nxf32_rational_28_25 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_26 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_26 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7905,7 +7905,7 @@ jbm_nxf32_rational_28_26 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_28_27 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_28_27 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -7920,7 +7920,7 @@ jbm_nxf32_rational_28_27 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_0 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_29_0 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7936,7 +7936,7 @@ jbm_nxf32_rational_29_0 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_29_1 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7952,7 +7952,7 @@ jbm_nxf32_rational_29_1 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_29_2 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7968,7 +7968,7 @@ jbm_nxf32_rational_29_2 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_3 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_29_3 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -7984,7 +7984,7 @@ jbm_nxf32_rational_29_3 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_4 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_29_4 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -8000,7 +8000,7 @@ jbm_nxf32_rational_29_4 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_5 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_29_5 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -8016,7 +8016,7 @@ jbm_nxf32_rational_29_5 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_6 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_29_6 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -8032,7 +8032,7 @@ jbm_nxf32_rational_29_6 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_7 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_29_7 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -8048,7 +8048,7 @@ jbm_nxf32_rational_29_7 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_8 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_29_8 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -8064,7 +8064,7 @@ jbm_nxf32_rational_29_8 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_9 (svbool_t pg,   ///< predicate.
+jbm_nxf32_rational_29_9 (const svbool_t pg,   ///< predicate.
                          const svfloat32_t x,   ///< svfloat32_t vector.
                          const float *p)        ///< array of coefficients.
 {
@@ -8080,7 +8080,7 @@ jbm_nxf32_rational_29_9 (svbool_t pg,   ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_10 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_10 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8096,7 +8096,7 @@ jbm_nxf32_rational_29_10 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_11 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_11 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8112,7 +8112,7 @@ jbm_nxf32_rational_29_11 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_12 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_12 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8128,7 +8128,7 @@ jbm_nxf32_rational_29_12 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_13 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_13 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8144,7 +8144,7 @@ jbm_nxf32_rational_29_13 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_14 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_14 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8160,7 +8160,7 @@ jbm_nxf32_rational_29_14 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_15 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_15 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8176,7 +8176,7 @@ jbm_nxf32_rational_29_15 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_16 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_16 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8192,7 +8192,7 @@ jbm_nxf32_rational_29_16 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_17 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_17 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8208,7 +8208,7 @@ jbm_nxf32_rational_29_17 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_18 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_18 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8224,7 +8224,7 @@ jbm_nxf32_rational_29_18 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_19 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_19 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8240,7 +8240,7 @@ jbm_nxf32_rational_29_19 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_20 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_20 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8256,7 +8256,7 @@ jbm_nxf32_rational_29_20 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_21 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_21 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8272,7 +8272,7 @@ jbm_nxf32_rational_29_21 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_22 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_22 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8288,7 +8288,7 @@ jbm_nxf32_rational_29_22 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_23 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_23 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8304,7 +8304,7 @@ jbm_nxf32_rational_29_23 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_24 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_24 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8320,7 +8320,7 @@ jbm_nxf32_rational_29_24 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_25 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_25 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8336,7 +8336,7 @@ jbm_nxf32_rational_29_25 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_26 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_26 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8352,7 +8352,7 @@ jbm_nxf32_rational_29_26 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_27 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_27 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8368,7 +8368,7 @@ jbm_nxf32_rational_29_27 (svbool_t pg,  ///< predicate.
  * \return svfloat32_t vector of rational values.
  */
 static inline svfloat32_t
-jbm_nxf32_rational_29_28 (svbool_t pg,  ///< predicate.
+jbm_nxf32_rational_29_28 (const svbool_t pg,  ///< predicate.
                           const svfloat32_t x,  ///< svfloat32_t vector.
                           const float *p)       ///< array of coefficients.
 {
@@ -8384,7 +8384,7 @@ jbm_nxf32_rational_29_28 (svbool_t pg,  ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_cbrtwc (svbool_t pg,  ///< predicate.
+jbm_nxf32_cbrtwc (const svbool_t pg,  ///< predicate.
                   const svfloat32_t x)
                   ///< svfloat32_t vector \f$\in\left[\frac12,\;1\right]\f$.
 {
@@ -8397,7 +8397,7 @@ jbm_nxf32_cbrtwc (svbool_t pg,  ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_cbrt (svbool_t pg,    ///< predicate.
+jbm_nxf32_cbrt (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x)    ///< svfloat32_t vector.
 {
   const svfloat32_t xa = svabs_f32_x (pg, x);
@@ -8429,7 +8429,7 @@ jbm_nxf32_cbrt (svbool_t pg,    ///< predicate.
  * \return function value.
  */
 static inline svfloat32_t
-jbm_nxf32_exp2wc (svbool_t pg,  ///< predicate.
+jbm_nxf32_exp2wc (const svbool_t pg,  ///< predicate.
                   const svfloat32_t x)
                   ///< svfloat32_t vector \f$\in[\frac12,1]\f$.
 {
@@ -8443,7 +8443,7 @@ jbm_nxf32_exp2wc (svbool_t pg,  ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_exp2 (svbool_t pg,    ///< predicate.
+jbm_nxf32_exp2 (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x)    ///< svfloat32_t vector.
 {
   const svint32_t i = jbm_nxf32_floor (pg, x);
@@ -8458,7 +8458,7 @@ jbm_nxf32_exp2 (svbool_t pg,    ///< predicate.
  * \return function value.
  */
 static inline svfloat32_t
-jbm_nxf32_exp (svbool_t pg,     ///< predicate.
+jbm_nxf32_exp (const svbool_t pg,     ///< predicate.
                const svfloat32_t x)     ///< svfloat32_t vector.
 {
   return jbm_nxf32_exp2 (pg, svmul_n_f32_x (pg, x, M_LOG2Ef));
@@ -8471,7 +8471,7 @@ jbm_nxf32_exp (svbool_t pg,     ///< predicate.
  * \return function value.
  */
 static inline svfloat32_t
-jbm_nxf32_exp10 (svbool_t pg,   ///< predicate.
+jbm_nxf32_exp10 (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_exp2 (pg, svmul_n_f32_x (pg, x, M_LN10f / M_LN2f));
@@ -8484,7 +8484,7 @@ jbm_nxf32_exp10 (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_expm1wc (svbool_t pg, ///< predicate.
+jbm_nxf32_expm1wc (const svbool_t pg, ///< predicate.
                    const svfloat32_t x)
 ///< svfloat32_t vector \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
 {
@@ -8507,7 +8507,7 @@ jbm_nxf32_expm1wc (svbool_t pg, ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_expm1 (svbool_t pg,   ///< predicate.
+jbm_nxf32_expm1 (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return
@@ -8523,7 +8523,7 @@ jbm_nxf32_expm1 (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_log2wc (svbool_t pg,  ///< predicate.
+jbm_nxf32_log2wc (const svbool_t pg,  ///< predicate.
                   const svfloat32_t x)
                   ///< svfloat32_t vector \f$\in[0.5,1]\f$.
 {
@@ -8537,7 +8537,7 @@ jbm_nxf32_log2wc (svbool_t pg,  ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_log2 (svbool_t pg,    ///< predicate.
+jbm_nxf32_log2 (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x)    ///< svfloat32_t vector.
 {
   svfloat32_t y;
@@ -8563,7 +8563,7 @@ jbm_nxf32_log2 (svbool_t pg,    ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_log (svbool_t pg,     ///< predicate.
+jbm_nxf32_log (const svbool_t pg,     ///< predicate.
                const svfloat32_t x)     ///< svfloat32_t vector.
 {
   return svmul_n_f32_x (pg, jbm_nxf32_log2 (pg, x), M_LN2f);
@@ -8575,7 +8575,7 @@ jbm_nxf32_log (svbool_t pg,     ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_log10 (svbool_t pg,   ///< predicate.
+jbm_nxf32_log10 (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return svmul_n_f32_x (pg, jbm_nxf32_log2 (pg, x), M_LN2f / M_LN10f);
@@ -8588,7 +8588,7 @@ jbm_nxf32_log10 (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_pown (svbool_t pg,    ///< predicate.
+jbm_nxf32_pown (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x,    ///< svfloat32_t vector.
                 const int e)    ///< exponent (int).
 {
@@ -8612,7 +8612,7 @@ jbm_nxf32_pown (svbool_t pg,    ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_pow1 (svbool_t pg,    ///< predicate.
+jbm_nxf32_pow1 (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x,    ///< svfloat32_t vector.
                 const float e)  ///< exponent (float).
 {
@@ -8626,7 +8626,7 @@ jbm_nxf32_pow1 (svbool_t pg,    ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_pow (svbool_t pg,     ///< predicate.
+jbm_nxf32_pow (const svbool_t pg,     ///< predicate.
                const svfloat32_t x,     ///< svfloat32_t vector.
                const svfloat32_t e)     ///< exponent (svfloat32_t).
 {
@@ -8640,7 +8640,7 @@ jbm_nxf32_pow (svbool_t pg,     ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_sinwc (svbool_t pg,   ///< predicate.
+jbm_nxf32_sinwc (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)
                  ///< svfloat32_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
@@ -8656,7 +8656,7 @@ jbm_nxf32_sinwc (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_coswc (svbool_t pg,   ///< predicate.
+jbm_nxf32_coswc (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)
                  ///< svfloat32_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
@@ -8670,7 +8670,7 @@ jbm_nxf32_coswc (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_tanwc (svbool_t pg,   ///< predicate.
+jbm_nxf32_tanwc (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)
                  ///< svfloat32_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
@@ -8684,7 +8684,7 @@ jbm_nxf32_tanwc (svbool_t pg,   ///< predicate.
  * x in [-pi/4,pi/4] from jbm_nxf32_sinwc approximation (svfloat32_t).
  */
 static inline void
-jbm_nxf32_sincoswc (svbool_t pg,        ///< predicate.
+jbm_nxf32_sincoswc (const svbool_t pg,        ///< predicate.
                     const svfloat32_t x,
                     ///< svfloat32_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     svfloat32_t *s,     ///< pointer to the sin function value.
@@ -8702,7 +8702,7 @@ jbm_nxf32_sincoswc (svbool_t pg,        ///< predicate.
  * \return reduced vector (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_trig (svbool_t pg,    ///< predicate.
+jbm_nxf32_trig (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x,    ///< svfloat32_t vector.
                 svint32_t *q)   ///< pointer to the quadrant (svint32_t).
 {
@@ -8718,7 +8718,7 @@ jbm_nxf32_trig (svbool_t pg,    ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_sin (svbool_t pg,     ///< predicate.
+jbm_nxf32_sin (const svbool_t pg,     ///< predicate.
                const svfloat32_t x)     ///< svfloat32_t vector.
 {
   svfloat32_t y, s, c;
@@ -8737,7 +8737,7 @@ jbm_nxf32_sin (svbool_t pg,     ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_cos (svbool_t pg,     ///< predicate.
+jbm_nxf32_cos (const svbool_t pg,     ///< predicate.
                const svfloat32_t x)     ///< svfloat32_t vector.
 {
   svfloat32_t y, s, c;
@@ -8755,7 +8755,7 @@ jbm_nxf32_cos (svbool_t pg,     ///< predicate.
  * jbm_nxf32_sinwc and jbm_nxf32_coswc approximations (svfloat32_t).
  */
 static inline void
-jbm_nxf32_sincos (svbool_t pg,  ///< predicate.
+jbm_nxf32_sincos (const svbool_t pg,  ///< predicate.
                   const svfloat32_t x,  ///< svfloat32_t vector.
                   svfloat32_t *s,       ///< pointer to the sin function value.
                   svfloat32_t *c)       ///< pointer to the cos function value.
@@ -8782,7 +8782,7 @@ jbm_nxf32_sincos (svbool_t pg,  ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_tan (svbool_t pg,     ///< predicate.
+jbm_nxf32_tan (const svbool_t pg,     ///< predicate.
                const svfloat32_t x)     ///< svfloat32_t vector.
 {
   svfloat32_t y, z;
@@ -8799,7 +8799,7 @@ jbm_nxf32_tan (svbool_t pg,     ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_atanwc (svbool_t pg,  ///< predicate.
+jbm_nxf32_atanwc (const svbool_t pg,  ///< predicate.
                   const svfloat32_t x)
                   ///< svfloat32_t vector \f$\in\left[-1,1\right]\f$.
 {
@@ -8815,7 +8815,7 @@ jbm_nxf32_atanwc (svbool_t pg,  ///< predicate.
  * \return function value (in [-pi/2,pi/2]) (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_atan (svbool_t pg,    ///< predicate.
+jbm_nxf32_atan (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x)    ///< svfloat32_t vector.
 {
   svfloat32_t f, ax;
@@ -8835,7 +8835,7 @@ jbm_nxf32_atan (svbool_t pg,    ///< predicate.
  * \return function value (in [-pi,pi]) (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_atan2 (svbool_t pg,   ///< predicate.
+jbm_nxf32_atan2 (const svbool_t pg,   ///< predicate.
                  const svfloat32_t y,   ///< svfloat32_t y component.
                  const svfloat32_t x)   ///< svfloat32_t x component.
 {
@@ -8855,7 +8855,7 @@ jbm_nxf32_atan2 (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t in [-pi/2,pi/2]).
  */
 static inline svfloat32_t
-jbm_nxf32_asin (svbool_t pg,    ///< predicate.
+jbm_nxf32_asin (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x)    ///< svfloat32_t vector.
 {
   return
@@ -8873,7 +8873,7 @@ jbm_nxf32_asin (svbool_t pg,    ///< predicate.
  * \return function value (in [0,pi]) (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_acos (svbool_t pg,    ///< predicate.
+jbm_nxf32_acos (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x)    ///< svfloat32_t vector.
 {
   const svfloat32_t k1 = svdup_n_f32 (1.f);
@@ -8892,7 +8892,7 @@ jbm_nxf32_acos (svbool_t pg,    ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_sinh (svbool_t pg,    ///< predicate.
+jbm_nxf32_sinh (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x)    ///< svfloat32_t vector.
 {
   const svfloat32_t f = jbm_nxf32_expm1 (pg, jbm_nxf32_abs (pg, x));
@@ -8911,7 +8911,7 @@ jbm_nxf32_sinh (svbool_t pg,    ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_cosh (svbool_t pg,    ///< predicate.
+jbm_nxf32_cosh (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x)    ///< svfloat32_t vector.
 {
   const svfloat32_t f = jbm_nxf32_exp (pg, x);
@@ -8925,7 +8925,7 @@ jbm_nxf32_cosh (svbool_t pg,    ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_tanh (svbool_t pg,    ///< predicate.
+jbm_nxf32_tanh (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x)    ///< svfloat32_t vector.
 {
   const svfloat32_t x2 = jbm_nxf32_dbl (pg, x);
@@ -8943,7 +8943,7 @@ jbm_nxf32_tanh (svbool_t pg,    ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_asinh (svbool_t pg,   ///< predicate.
+jbm_nxf32_asinh (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return
@@ -8961,7 +8961,7 @@ jbm_nxf32_asinh (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_acosh (svbool_t pg,   ///< predicate.
+jbm_nxf32_acosh (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return
@@ -8980,7 +8980,7 @@ jbm_nxf32_acosh (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_atanh (svbool_t pg,   ///< predicate.
+jbm_nxf32_atanh (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)   ///< svfloat32_t vector.
 {
   const svfloat32_t u = svdup_n_f32 (1.f);
@@ -8998,7 +8998,7 @@ jbm_nxf32_atanh (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_erfwc (svbool_t pg,   ///< predicate.
+jbm_nxf32_erfwc (const svbool_t pg,   ///< predicate.
                  const svfloat32_t x)
                  ///< svfloat32_t vector \f$\in\left[-1,1\right]\f$.
 {
@@ -9014,7 +9014,7 @@ jbm_nxf32_erfwc (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_erfcwc (svbool_t pg,  ///< predicate.
+jbm_nxf32_erfcwc (const svbool_t pg,  ///< predicate.
                   const svfloat32_t x)
                   ///< svfloat32_t vector \f$\in\left[1,\infty\right]\f$.
 {
@@ -9038,7 +9038,7 @@ jbm_nxf32_erfcwc (svbool_t pg,  ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_erf (svbool_t pg,     ///< predicate.
+jbm_nxf32_erf (const svbool_t pg,     ///< predicate.
                const svfloat32_t x)     ///< svfloat32_t vector.
 {
   const svfloat32_t ax = jbm_nxf32_abs (pg, x);
@@ -9056,7 +9056,7 @@ jbm_nxf32_erf (svbool_t pg,     ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_erfc (svbool_t pg,    ///< predicate.
+jbm_nxf32_erfc (const svbool_t pg,    ///< predicate.
                 const svfloat32_t x)    ///< svfloat32_t vector.
 {
   const svfloat32_t ax = jbm_nxf32_abs (pg, x);
@@ -9079,7 +9079,7 @@ jbm_nxf32_erfc (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of solution values.
  */
 static inline svfloat32_t
-jbm_nxf32_solve_quadratic_reduced (svbool_t pg, ///< predicate.
+jbm_nxf32_solve_quadratic_reduced (const svbool_t pg, ///< predicate.
                                    svfloat32_t a,
 ///< svfloat32_t vector of 1st order coefficient of the equations.
                                    svfloat32_t b,
@@ -9106,7 +9106,7 @@ jbm_nxf32_solve_quadratic_reduced (svbool_t pg, ///< predicate.
  * \return svfloat32_t vector of solution values.
  */
 static inline svfloat32_t
-jbm_nxf32_solve_quadratic (svbool_t pg, ///< predicate.
+jbm_nxf32_solve_quadratic (const svbool_t pg, ///< predicate.
                            svfloat32_t a,
 ///< svfloat32_t vector of 2nd order coefficient of the equations.
                            svfloat32_t b,
@@ -9134,7 +9134,7 @@ jbm_nxf32_solve_quadratic (svbool_t pg, ///< predicate.
  * \return svfloat32_t vector of solution values.
  */
 static inline svfloat32_t
-jbm_nxf32_solve_cubic_reduced (svbool_t pg,     ///< predicate.
+jbm_nxf32_solve_cubic_reduced (const svbool_t pg,     ///< predicate.
                                svfloat32_t a,
 ///< svfloat32_t vector of 2nd order coefficient of the equations.
                                svfloat32_t b,
@@ -9198,7 +9198,7 @@ jbm_nxf32_solve_cubic_reduced (svbool_t pg,     ///< predicate.
  * \return svfloat32_t vector of solution values.
  */
 static inline svfloat32_t
-jbm_nxf32_solve_cubic (svbool_t pg,     ///< predicate.
+jbm_nxf32_solve_cubic (const svbool_t pg,     ///< predicate.
                        svfloat32_t a,
 ///< svfloat32_t vector of 3rd order coefficient of the equations.
                        svfloat32_t b,
@@ -9228,7 +9228,7 @@ jbm_nxf32_solve_cubic (svbool_t pg,     ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_total (svbool_t pg __attribute__((unused)),
+jbm_nxf32_flux_limiter_total (const svbool_t pg __attribute__((unused)),
                               ///< predicate.
                               const svfloat32_t d1 __attribute__((unused)),
                               ///< 1st flux limiter function parameter.
@@ -9245,7 +9245,7 @@ jbm_nxf32_flux_limiter_total (svbool_t pg __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_null (svbool_t pg __attribute__((unused)),
+jbm_nxf32_flux_limiter_null (const svbool_t pg __attribute__((unused)),
                              ///< predicate.
                              const svfloat32_t d1 __attribute__((unused)),
                              ///< 1st flux limiter function parameter.
@@ -9262,7 +9262,7 @@ jbm_nxf32_flux_limiter_null (svbool_t pg __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_centred (svbool_t pg,    ///< predicate.
+jbm_nxf32_flux_limiter_centred (const svbool_t pg,    ///< predicate.
                                 const svfloat32_t d1,
                                 ///< 1st flux limiter function parameter.
                                 const svfloat32_t d2)
@@ -9281,7 +9281,7 @@ jbm_nxf32_flux_limiter_centred (svbool_t pg,    ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_superbee (svbool_t pg,   ///< predicate.
+jbm_nxf32_flux_limiter_superbee (const svbool_t pg,   ///< predicate.
                                  const svfloat32_t d1,
                                  ///< 1st flux limiter function parameter.
                                  const svfloat32_t d2)
@@ -9303,7 +9303,7 @@ jbm_nxf32_flux_limiter_superbee (svbool_t pg,   ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_minmod (svbool_t pg,     ///< predicate.
+jbm_nxf32_flux_limiter_minmod (const svbool_t pg,     ///< predicate.
                                const svfloat32_t d1,
                                ///< 1st flux limiter function parameter.
                                const svfloat32_t d2)
@@ -9324,7 +9324,7 @@ jbm_nxf32_flux_limiter_minmod (svbool_t pg,     ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_VanLeer (svbool_t pg,    ///< predicate.
+jbm_nxf32_flux_limiter_VanLeer (const svbool_t pg,    ///< predicate.
                                 const svfloat32_t d1,
                                 ///< 1st flux limiter function parameter.
                                 const svfloat32_t d2)
@@ -9346,7 +9346,7 @@ jbm_nxf32_flux_limiter_VanLeer (svbool_t pg,    ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_VanAlbada (svbool_t pg,  ///< predicate.
+jbm_nxf32_flux_limiter_VanAlbada (const svbool_t pg,  ///< predicate.
                                   const svfloat32_t d1,
                                   ///< 1st flux limiter function parameter.
                                   const svfloat32_t d2)
@@ -9368,7 +9368,7 @@ jbm_nxf32_flux_limiter_VanAlbada (svbool_t pg,  ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_minsuper (svbool_t pg,   ///< predicate.
+jbm_nxf32_flux_limiter_minsuper (const svbool_t pg,   ///< predicate.
                                  const svfloat32_t d1,
                                  ///< 1st flux limiter function parameter.
                                  const svfloat32_t d2)
@@ -9388,7 +9388,7 @@ jbm_nxf32_flux_limiter_minsuper (svbool_t pg,   ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_supermin (svbool_t pg,   ///< predicate.
+jbm_nxf32_flux_limiter_supermin (const svbool_t pg,   ///< predicate.
                                  const svfloat32_t d1,
                                  ///< 1st flux limiter function parameter.
                                  const svfloat32_t d2)
@@ -9410,7 +9410,7 @@ jbm_nxf32_flux_limiter_supermin (svbool_t pg,   ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_monotonized_central (svbool_t pg,
+jbm_nxf32_flux_limiter_monotonized_central (const svbool_t pg,
 ///< predicate.
                                             const svfloat32_t d1,
 ///< 1st flux limiter function parameter.
@@ -9434,7 +9434,7 @@ jbm_nxf32_flux_limiter_monotonized_central (svbool_t pg,
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_mean (svbool_t pg,       ///< predicate.
+jbm_nxf32_flux_limiter_mean (const svbool_t pg,       ///< predicate.
                              const svfloat32_t d1,
                              ///< 1st flux limiter function parameter.
                              const svfloat32_t d2)
@@ -9453,7 +9453,7 @@ jbm_nxf32_flux_limiter_mean (svbool_t pg,       ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter (svbool_t pg,    ///< predicate.
+jbm_nxf32_flux_limiter (const svbool_t pg,    ///< predicate.
                         const svfloat32_t d1,
                         ///< 1st flux limiter function parameter.
                         const svfloat32_t d2,
@@ -9494,7 +9494,7 @@ jbm_nxf32_flux_limiter (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of integral values.
  */
 static inline svfloat32_t
-jbm_nxf32_integral (svbool_t pg,        ///< predicate.
+jbm_nxf32_integral (const svbool_t pg,        ///< predicate.
                     svfloat32_t (*f) (svbool_t, const svfloat32_t),
                     ///< pointer to the function to integrate.
                     const svfloat32_t x1,       ///< left limit of the interval.
@@ -9526,7 +9526,7 @@ jbm_nxf32_integral (svbool_t pg,        ///< predicate.
  * Function to calculate the additive inverse value of a svfloat64_t vector.
  */
 static inline svfloat64_t
-jbm_nxf64_opposite (svbool_t pg,        ///< predicate.
+jbm_nxf64_opposite (const svbool_t pg,        ///< predicate.
                     const svfloat64_t x)        ///< svfloat64_t vector.
 {
   return svneg_f64_x (pg, x);
@@ -9537,7 +9537,7 @@ jbm_nxf64_opposite (svbool_t pg,        ///< predicate.
  * vector.
  */
 static inline svfloat64_t
-jbm_nxf64_reciprocal (svbool_t pg,      ///< predicate.
+jbm_nxf64_reciprocal (const svbool_t pg,      ///< predicate.
                       const svfloat64_t x)      ///< svfloat64_t vector.
 {
   return svdiv_f64_x (pg, svdup_n_f64 (1.), x);
@@ -9547,7 +9547,7 @@ jbm_nxf64_reciprocal (svbool_t pg,      ///< predicate.
  * Function to calculate the absolute value of a svfloat64_t vector.
  */
 static inline svfloat64_t
-jbm_nxf64_abs (svbool_t pg,     ///< predicate.
+jbm_nxf64_abs (const svbool_t pg,     ///< predicate.
                const svfloat64_t x)     ///< svfloat64_t vector.
 {
   return svabs_f64_x (pg, x);
@@ -9572,7 +9572,7 @@ jbm_nxf64_copysign (const svfloat64_t x,
  * Function to calculate the hypot function (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_hypot (svbool_t pg,   ///< predicate.
+jbm_nxf64_hypot (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x,   ///< 1st svfloat64_t vector.
                  const svfloat64_t y)   ///< 2nd svfloat64_t vector.
 {
@@ -9585,7 +9585,7 @@ jbm_nxf64_hypot (svbool_t pg,   ///< predicate.
  * Function to rounding to nearest (svfloat64_t).
  */
 static inline svint64_t
-jbm_nxf64_round (svbool_t pg,   ///< predicate.
+jbm_nxf64_round (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return svcvt_s64_f64_x (pg, svrintn_f64_x (pg, x));
@@ -9595,7 +9595,7 @@ jbm_nxf64_round (svbool_t pg,   ///< predicate.
  * Function to rounding towards zero (svfloat64_t).
  */
 static inline svint64_t
-jbm_nxf64_trunc (svbool_t pg,   ///< predicate.
+jbm_nxf64_trunc (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return svcvt_s64_f64_x (pg, svrintz_f64_x (pg, x));
@@ -9605,7 +9605,7 @@ jbm_nxf64_trunc (svbool_t pg,   ///< predicate.
  * Function to rounding down (svfloat64_t).
  */
 static inline svint64_t
-jbm_nxf64_floor (svbool_t pg,   ///< predicate.
+jbm_nxf64_floor (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return svcvt_s64_f64_x (pg, svrintm_f64_x (pg, x));
@@ -9615,7 +9615,7 @@ jbm_nxf64_floor (svbool_t pg,   ///< predicate.
  * Function to rounding top (svfloat64_t).
  */
 static inline svint64_t
-jbm_nxf64_ceil (svbool_t pg,    ///< predicate.
+jbm_nxf64_ceil (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   return svcvt_s64_f64_x (pg, svrintp_f64_x (pg, x));
@@ -9625,7 +9625,7 @@ jbm_nxf64_ceil (svbool_t pg,    ///< predicate.
  * Function to calculate the rest of a division (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_mod (svbool_t pg,     ///< predicate.
+jbm_nxf64_mod (const svbool_t pg,     ///< predicate.
                const svfloat64_t x,     ///< dividend (svfloat64_t).
                const svfloat64_t d)     ///< divisor (svfloat64_t).
 {
@@ -9638,7 +9638,7 @@ jbm_nxf64_mod (svbool_t pg,     ///< predicate.
  * Function to calculate the rest of a division by a double (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_mod1 (svbool_t pg,    ///< predicate.
+jbm_nxf64_mod1 (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x,    ///< dividend (svfloat64_t).
                 const double d) ///< divisor (double).
 {
@@ -9654,7 +9654,7 @@ jbm_nxf64_mod1 (svbool_t pg,    ///< predicate.
  * \return normalized fraction value in [1/2,1) (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_frexp (svbool_t pg,   ///< predicate.
+jbm_nxf64_frexp (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x,   ///< svfloat64_t vector.
                  svint64_t *e)  ///< pointer to the exponents vector.
 {
@@ -9697,7 +9697,7 @@ jbm_nxf64_frexp (svbool_t pg,   ///< predicate.
  * \return function value vector (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_exp2n (svbool_t pg,   ///< predicate.
+jbm_nxf64_exp2n (const svbool_t pg,   ///< predicate.
                  svint64_t e)   ///< exponent vector (svint64_t).
 {
   return svscale_f64_x (pg, svdup_n_f64 (1.), e);
@@ -9709,7 +9709,7 @@ jbm_nxf64_exp2n (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_ldexp (svbool_t pg,   ///< predicate.
+jbm_nxf64_ldexp (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x,   ///< svfloat64_t vector.
                  svint64_t e)   ///< exponent vector (svint64_t).
 {
@@ -9722,7 +9722,7 @@ jbm_nxf64_ldexp (svbool_t pg,   ///< predicate.
  * \return predicate true on small numbers.
  */
 static inline svbool_t
-jbm_nxf64_small (svbool_t pg,   ///< predicate.
+jbm_nxf64_small (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return svcmplt_n_f64 (pg, svabs_f64_x (pg, x), DBL_EPSILON);
@@ -9740,7 +9740,7 @@ jbm_nxf64_small (svbool_t pg,   ///< predicate.
  * \return modmin svfloat64_t vector.
  */
 static inline svfloat64_t
-jbm_nxf64_modmin (svbool_t pg,  ///< predicate.
+jbm_nxf64_modmin (const svbool_t pg,  ///< predicate.
                   const svfloat64_t a,  ///< 1st svfloat64_t vector.
                   const svfloat64_t b)  ///< 2nd svfloat64_t vector.
 {
@@ -9769,7 +9769,7 @@ jbm_nxf64_change (svfloat64_t *restrict a,      ///< 1st vector pointer.
  * \return svfloat64_t double.
  */
 static inline svfloat64_t
-jbm_nxf64_dbl (svbool_t pg,     ///< predicate.
+jbm_nxf64_dbl (const svbool_t pg,     ///< predicate.
                const svfloat64_t x)     ///< svfloat64_t vector.
 {
   return svadd_f64_x (pg, x, x);
@@ -9781,7 +9781,7 @@ jbm_nxf64_dbl (svbool_t pg,     ///< predicate.
  * \return svfloat64_t vector square.
  */
 static inline svfloat64_t
-jbm_nxf64_sqr (svbool_t pg,     ///< predicate.
+jbm_nxf64_sqr (const svbool_t pg,     ///< predicate.
                const svfloat64_t x)     ///< svfloat64_t vector.
 {
   return svmul_f64_x (pg, x, x);
@@ -9794,7 +9794,7 @@ jbm_nxf64_sqr (svbool_t pg,     ///< predicate.
  * \return svfloat64_t vector of y-coordinates of the extrapolated points.
  */
 static inline svfloat64_t
-jbm_nxf64_extrapolate (svbool_t pg,     ///< predicate.
+jbm_nxf64_extrapolate (const svbool_t pg,     ///< predicate.
                        const svfloat64_t x,     ///< x-coord. of points.
                        const svfloat64_t x1,    ///< x-coord. of 1st points.
                        const svfloat64_t x2,    ///< x-coord. of 2nd points.
@@ -9814,7 +9814,7 @@ jbm_nxf64_extrapolate (svbool_t pg,     ///< predicate.
  * \return svfloat64_t vector of y-coordinates of the interpolated points.
  */
 static inline svfloat64_t
-jbm_nxf64_interpolate (svbool_t pg,     ///< predicate.
+jbm_nxf64_interpolate (const svbool_t pg,     ///< predicate.
                        const svfloat64_t x,     ///< x-coord. of points.
                        const svfloat64_t x1,    ///< x-coord. of 1st points.
                        const svfloat64_t x2,    ///< x-coord. of 2nd points.
@@ -9832,7 +9832,7 @@ jbm_nxf64_interpolate (svbool_t pg,     ///< predicate.
  * \return svfloat64_t vector of segment lengths.
  */
 static inline svfloat64_t
-jbm_nxf64_v2_length (svbool_t pg,       ///< predicate.
+jbm_nxf64_v2_length (const svbool_t pg,       ///< predicate.
                      const svfloat64_t x1,      ///< x-coord. of 1st points.
                      const svfloat64_t y1,      ///< y-coord. of 1st points.
                      const svfloat64_t x2,      ///< x-coord. of 2nd points.
@@ -9848,7 +9848,7 @@ jbm_nxf64_v2_length (svbool_t pg,       ///< predicate.
  * \return svfloat64_t vector of segment lengths.
  */
 static inline svfloat64_t
-jbm_nxf64_v3_length (svbool_t pg,       ///< predicate.
+jbm_nxf64_v3_length (const svbool_t pg,       ///< predicate.
                      const svfloat64_t x1,      ///< x-coord. of 1st points.
                      const svfloat64_t y1,      ///< y-coord. of 1st points.
                      const svfloat64_t z1,      ///< z-coord. of 1st points.
@@ -9869,7 +9869,7 @@ jbm_nxf64_v3_length (svbool_t pg,       ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_1 (svbool_t pg,    ///< predicate.
+jbm_nxf64_polynomial_1 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -9882,7 +9882,7 @@ jbm_nxf64_polynomial_1 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_2 (svbool_t pg,    ///< predicate.
+jbm_nxf64_polynomial_2 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -9896,7 +9896,7 @@ jbm_nxf64_polynomial_2 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_3 (svbool_t pg,    ///< predicate.
+jbm_nxf64_polynomial_3 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -9910,7 +9910,7 @@ jbm_nxf64_polynomial_3 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_4 (svbool_t pg,    ///< predicate.
+jbm_nxf64_polynomial_4 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -9924,7 +9924,7 @@ jbm_nxf64_polynomial_4 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_5 (svbool_t pg,    ///< predicate.
+jbm_nxf64_polynomial_5 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -9938,7 +9938,7 @@ jbm_nxf64_polynomial_5 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_6 (svbool_t pg,    ///< predicate.
+jbm_nxf64_polynomial_6 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -9952,7 +9952,7 @@ jbm_nxf64_polynomial_6 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_7 (svbool_t pg,    ///< predicate.
+jbm_nxf64_polynomial_7 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -9966,7 +9966,7 @@ jbm_nxf64_polynomial_7 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_8 (svbool_t pg,    ///< predicate.
+jbm_nxf64_polynomial_8 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -9980,7 +9980,7 @@ jbm_nxf64_polynomial_8 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_9 (svbool_t pg,    ///< predicate.
+jbm_nxf64_polynomial_9 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -9994,7 +9994,7 @@ jbm_nxf64_polynomial_9 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_10 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_10 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10008,7 +10008,7 @@ jbm_nxf64_polynomial_10 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_11 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_11 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10022,7 +10022,7 @@ jbm_nxf64_polynomial_11 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_12 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_12 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10036,7 +10036,7 @@ jbm_nxf64_polynomial_12 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_13 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_13 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10050,7 +10050,7 @@ jbm_nxf64_polynomial_13 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_14 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_14 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10064,7 +10064,7 @@ jbm_nxf64_polynomial_14 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_15 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_15 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10078,7 +10078,7 @@ jbm_nxf64_polynomial_15 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_16 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_16 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10092,7 +10092,7 @@ jbm_nxf64_polynomial_16 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_17 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_17 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10106,7 +10106,7 @@ jbm_nxf64_polynomial_17 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_18 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_18 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10120,7 +10120,7 @@ jbm_nxf64_polynomial_18 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_19 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_19 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10134,7 +10134,7 @@ jbm_nxf64_polynomial_19 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_20 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_20 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10148,7 +10148,7 @@ jbm_nxf64_polynomial_20 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_21 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_21 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10162,7 +10162,7 @@ jbm_nxf64_polynomial_21 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_22 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_22 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10176,7 +10176,7 @@ jbm_nxf64_polynomial_22 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_23 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_23 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10190,7 +10190,7 @@ jbm_nxf64_polynomial_23 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_24 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_24 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10204,7 +10204,7 @@ jbm_nxf64_polynomial_24 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_25 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_25 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10218,7 +10218,7 @@ jbm_nxf64_polynomial_25 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_26 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_26 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10232,7 +10232,7 @@ jbm_nxf64_polynomial_26 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_27 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_27 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10246,7 +10246,7 @@ jbm_nxf64_polynomial_27 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_28 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_28 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10260,7 +10260,7 @@ jbm_nxf64_polynomial_28 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of polynomial values.
  */
 static inline svfloat64_t
-jbm_nxf64_polynomial_29 (svbool_t pg,   ///< predicate.
+jbm_nxf64_polynomial_29 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -10274,7 +10274,7 @@ jbm_nxf64_polynomial_29 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_1_0 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_1_0 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10289,7 +10289,7 @@ jbm_nxf64_rational_1_0 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_2_0 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_2_0 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10305,7 +10305,7 @@ jbm_nxf64_rational_2_0 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_2_1 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_2_1 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10320,7 +10320,7 @@ jbm_nxf64_rational_2_1 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_3_0 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_3_0 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10336,7 +10336,7 @@ jbm_nxf64_rational_3_0 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_3_1 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_3_1 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10352,7 +10352,7 @@ jbm_nxf64_rational_3_1 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_3_2 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_3_2 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10367,7 +10367,7 @@ jbm_nxf64_rational_3_2 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_4_0 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_4_0 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10383,7 +10383,7 @@ jbm_nxf64_rational_4_0 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_4_1 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_4_1 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10399,7 +10399,7 @@ jbm_nxf64_rational_4_1 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_4_2 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_4_2 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10415,7 +10415,7 @@ jbm_nxf64_rational_4_2 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_4_3 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_4_3 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10430,7 +10430,7 @@ jbm_nxf64_rational_4_3 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_5_0 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_5_0 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10446,7 +10446,7 @@ jbm_nxf64_rational_5_0 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_5_1 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_5_1 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10462,7 +10462,7 @@ jbm_nxf64_rational_5_1 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_5_2 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_5_2 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10478,7 +10478,7 @@ jbm_nxf64_rational_5_2 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_5_3 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_5_3 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10494,7 +10494,7 @@ jbm_nxf64_rational_5_3 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_5_4 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_5_4 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10509,7 +10509,7 @@ jbm_nxf64_rational_5_4 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_6_0 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_6_0 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10525,7 +10525,7 @@ jbm_nxf64_rational_6_0 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_6_1 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_6_1 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10541,7 +10541,7 @@ jbm_nxf64_rational_6_1 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_6_2 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_6_2 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10557,7 +10557,7 @@ jbm_nxf64_rational_6_2 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_6_3 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_6_3 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10573,7 +10573,7 @@ jbm_nxf64_rational_6_3 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_6_4 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_6_4 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10589,7 +10589,7 @@ jbm_nxf64_rational_6_4 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_6_5 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_6_5 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10604,7 +10604,7 @@ jbm_nxf64_rational_6_5 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_7_0 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_7_0 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10620,7 +10620,7 @@ jbm_nxf64_rational_7_0 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_7_1 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_7_1 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10636,7 +10636,7 @@ jbm_nxf64_rational_7_1 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_7_2 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_7_2 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10652,7 +10652,7 @@ jbm_nxf64_rational_7_2 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_7_3 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_7_3 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10668,7 +10668,7 @@ jbm_nxf64_rational_7_3 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_7_4 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_7_4 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10684,7 +10684,7 @@ jbm_nxf64_rational_7_4 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_7_5 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_7_5 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10700,7 +10700,7 @@ jbm_nxf64_rational_7_5 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_7_6 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_7_6 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10715,7 +10715,7 @@ jbm_nxf64_rational_7_6 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_8_0 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_8_0 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10731,7 +10731,7 @@ jbm_nxf64_rational_8_0 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_8_1 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_8_1 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10747,7 +10747,7 @@ jbm_nxf64_rational_8_1 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_8_2 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_8_2 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10763,7 +10763,7 @@ jbm_nxf64_rational_8_2 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_8_3 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_8_3 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10779,7 +10779,7 @@ jbm_nxf64_rational_8_3 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_8_4 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_8_4 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10795,7 +10795,7 @@ jbm_nxf64_rational_8_4 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_8_5 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_8_5 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10811,7 +10811,7 @@ jbm_nxf64_rational_8_5 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_8_6 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_8_6 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10827,7 +10827,7 @@ jbm_nxf64_rational_8_6 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_8_7 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_8_7 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10842,7 +10842,7 @@ jbm_nxf64_rational_8_7 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_9_0 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_9_0 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10858,7 +10858,7 @@ jbm_nxf64_rational_9_0 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_9_1 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_9_1 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10874,7 +10874,7 @@ jbm_nxf64_rational_9_1 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_9_2 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_9_2 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10890,7 +10890,7 @@ jbm_nxf64_rational_9_2 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_9_3 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_9_3 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10906,7 +10906,7 @@ jbm_nxf64_rational_9_3 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_9_4 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_9_4 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10922,7 +10922,7 @@ jbm_nxf64_rational_9_4 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_9_5 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_9_5 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10938,7 +10938,7 @@ jbm_nxf64_rational_9_5 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_9_6 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_9_6 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10954,7 +10954,7 @@ jbm_nxf64_rational_9_6 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_9_7 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_9_7 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10970,7 +10970,7 @@ jbm_nxf64_rational_9_7 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_9_8 (svbool_t pg,    ///< predicate.
+jbm_nxf64_rational_9_8 (const svbool_t pg,    ///< predicate.
                         const svfloat64_t x,    ///< svfloat64_t vector.
                         const double *p)        ///< array of coefficients.
 {
@@ -10985,7 +10985,7 @@ jbm_nxf64_rational_9_8 (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_10_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_10_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11001,7 +11001,7 @@ jbm_nxf64_rational_10_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_10_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_10_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11017,7 +11017,7 @@ jbm_nxf64_rational_10_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_10_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_10_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11033,7 +11033,7 @@ jbm_nxf64_rational_10_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_10_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_10_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11049,7 +11049,7 @@ jbm_nxf64_rational_10_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_10_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_10_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11065,7 +11065,7 @@ jbm_nxf64_rational_10_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_10_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_10_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11081,7 +11081,7 @@ jbm_nxf64_rational_10_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_10_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_10_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11097,7 +11097,7 @@ jbm_nxf64_rational_10_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_10_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_10_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11113,7 +11113,7 @@ jbm_nxf64_rational_10_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_10_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_10_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11129,7 +11129,7 @@ jbm_nxf64_rational_10_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_10_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_10_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11144,7 +11144,7 @@ jbm_nxf64_rational_10_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_11_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_11_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11160,7 +11160,7 @@ jbm_nxf64_rational_11_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_11_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_11_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11176,7 +11176,7 @@ jbm_nxf64_rational_11_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_11_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_11_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11192,7 +11192,7 @@ jbm_nxf64_rational_11_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_11_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_11_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11208,7 +11208,7 @@ jbm_nxf64_rational_11_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_11_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_11_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11224,7 +11224,7 @@ jbm_nxf64_rational_11_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_11_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_11_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11240,7 +11240,7 @@ jbm_nxf64_rational_11_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_11_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_11_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11256,7 +11256,7 @@ jbm_nxf64_rational_11_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_11_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_11_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11272,7 +11272,7 @@ jbm_nxf64_rational_11_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_11_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_11_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11288,7 +11288,7 @@ jbm_nxf64_rational_11_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_11_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_11_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11304,7 +11304,7 @@ jbm_nxf64_rational_11_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_11_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_11_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -11319,7 +11319,7 @@ jbm_nxf64_rational_11_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_12_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11335,7 +11335,7 @@ jbm_nxf64_rational_12_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_12_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11351,7 +11351,7 @@ jbm_nxf64_rational_12_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_12_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11367,7 +11367,7 @@ jbm_nxf64_rational_12_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_12_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11383,7 +11383,7 @@ jbm_nxf64_rational_12_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_12_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11399,7 +11399,7 @@ jbm_nxf64_rational_12_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_12_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11415,7 +11415,7 @@ jbm_nxf64_rational_12_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_12_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11431,7 +11431,7 @@ jbm_nxf64_rational_12_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_12_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11447,7 +11447,7 @@ jbm_nxf64_rational_12_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_12_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11463,7 +11463,7 @@ jbm_nxf64_rational_12_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_12_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11479,7 +11479,7 @@ jbm_nxf64_rational_12_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_12_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -11495,7 +11495,7 @@ jbm_nxf64_rational_12_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_12_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_12_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -11510,7 +11510,7 @@ jbm_nxf64_rational_12_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_13_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11526,7 +11526,7 @@ jbm_nxf64_rational_13_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_13_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11542,7 +11542,7 @@ jbm_nxf64_rational_13_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_13_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11558,7 +11558,7 @@ jbm_nxf64_rational_13_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_13_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11574,7 +11574,7 @@ jbm_nxf64_rational_13_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_13_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11590,7 +11590,7 @@ jbm_nxf64_rational_13_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_13_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11606,7 +11606,7 @@ jbm_nxf64_rational_13_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_13_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11622,7 +11622,7 @@ jbm_nxf64_rational_13_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_13_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11638,7 +11638,7 @@ jbm_nxf64_rational_13_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_13_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11654,7 +11654,7 @@ jbm_nxf64_rational_13_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_13_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11670,7 +11670,7 @@ jbm_nxf64_rational_13_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_13_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -11686,7 +11686,7 @@ jbm_nxf64_rational_13_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_13_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -11702,7 +11702,7 @@ jbm_nxf64_rational_13_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_13_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_13_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -11717,7 +11717,7 @@ jbm_nxf64_rational_13_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_14_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11733,7 +11733,7 @@ jbm_nxf64_rational_14_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_14_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11749,7 +11749,7 @@ jbm_nxf64_rational_14_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_14_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11765,7 +11765,7 @@ jbm_nxf64_rational_14_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_14_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11781,7 +11781,7 @@ jbm_nxf64_rational_14_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_14_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11797,7 +11797,7 @@ jbm_nxf64_rational_14_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_14_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11813,7 +11813,7 @@ jbm_nxf64_rational_14_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_14_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11829,7 +11829,7 @@ jbm_nxf64_rational_14_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_14_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11845,7 +11845,7 @@ jbm_nxf64_rational_14_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_14_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11861,7 +11861,7 @@ jbm_nxf64_rational_14_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_14_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11877,7 +11877,7 @@ jbm_nxf64_rational_14_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_14_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -11893,7 +11893,7 @@ jbm_nxf64_rational_14_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_14_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -11909,7 +11909,7 @@ jbm_nxf64_rational_14_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_14_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -11925,7 +11925,7 @@ jbm_nxf64_rational_14_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_14_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_14_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -11940,7 +11940,7 @@ jbm_nxf64_rational_14_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_15_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11956,7 +11956,7 @@ jbm_nxf64_rational_15_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_15_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11972,7 +11972,7 @@ jbm_nxf64_rational_15_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_15_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -11988,7 +11988,7 @@ jbm_nxf64_rational_15_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_15_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12004,7 +12004,7 @@ jbm_nxf64_rational_15_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_15_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12020,7 +12020,7 @@ jbm_nxf64_rational_15_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_15_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12036,7 +12036,7 @@ jbm_nxf64_rational_15_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_15_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12052,7 +12052,7 @@ jbm_nxf64_rational_15_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_15_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12068,7 +12068,7 @@ jbm_nxf64_rational_15_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_15_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12084,7 +12084,7 @@ jbm_nxf64_rational_15_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_15_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12100,7 +12100,7 @@ jbm_nxf64_rational_15_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_15_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12116,7 +12116,7 @@ jbm_nxf64_rational_15_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_15_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12132,7 +12132,7 @@ jbm_nxf64_rational_15_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_15_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12148,7 +12148,7 @@ jbm_nxf64_rational_15_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_15_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12164,7 +12164,7 @@ jbm_nxf64_rational_15_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_15_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_15_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12179,7 +12179,7 @@ jbm_nxf64_rational_15_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_16_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12195,7 +12195,7 @@ jbm_nxf64_rational_16_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_16_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12211,7 +12211,7 @@ jbm_nxf64_rational_16_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_16_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12227,7 +12227,7 @@ jbm_nxf64_rational_16_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_16_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12243,7 +12243,7 @@ jbm_nxf64_rational_16_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_16_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12259,7 +12259,7 @@ jbm_nxf64_rational_16_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_16_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12275,7 +12275,7 @@ jbm_nxf64_rational_16_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_16_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12291,7 +12291,7 @@ jbm_nxf64_rational_16_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_16_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12307,7 +12307,7 @@ jbm_nxf64_rational_16_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_16_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12323,7 +12323,7 @@ jbm_nxf64_rational_16_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_16_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12339,7 +12339,7 @@ jbm_nxf64_rational_16_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_16_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12355,7 +12355,7 @@ jbm_nxf64_rational_16_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_16_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12371,7 +12371,7 @@ jbm_nxf64_rational_16_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_16_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12387,7 +12387,7 @@ jbm_nxf64_rational_16_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_16_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12403,7 +12403,7 @@ jbm_nxf64_rational_16_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_16_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12419,7 +12419,7 @@ jbm_nxf64_rational_16_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_16_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_16_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12434,7 +12434,7 @@ jbm_nxf64_rational_16_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_17_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12450,7 +12450,7 @@ jbm_nxf64_rational_17_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_17_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12466,7 +12466,7 @@ jbm_nxf64_rational_17_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_17_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12482,7 +12482,7 @@ jbm_nxf64_rational_17_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_17_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12498,7 +12498,7 @@ jbm_nxf64_rational_17_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_17_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12514,7 +12514,7 @@ jbm_nxf64_rational_17_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_17_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12530,7 +12530,7 @@ jbm_nxf64_rational_17_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_17_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12546,7 +12546,7 @@ jbm_nxf64_rational_17_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_17_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12562,7 +12562,7 @@ jbm_nxf64_rational_17_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_17_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12578,7 +12578,7 @@ jbm_nxf64_rational_17_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_17_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12594,7 +12594,7 @@ jbm_nxf64_rational_17_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_17_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12610,7 +12610,7 @@ jbm_nxf64_rational_17_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_17_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12626,7 +12626,7 @@ jbm_nxf64_rational_17_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_17_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12642,7 +12642,7 @@ jbm_nxf64_rational_17_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_17_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12658,7 +12658,7 @@ jbm_nxf64_rational_17_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_17_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12674,7 +12674,7 @@ jbm_nxf64_rational_17_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_17_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12690,7 +12690,7 @@ jbm_nxf64_rational_17_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_17_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_17_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12705,7 +12705,7 @@ jbm_nxf64_rational_17_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_18_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12721,7 +12721,7 @@ jbm_nxf64_rational_18_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_18_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12737,7 +12737,7 @@ jbm_nxf64_rational_18_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_18_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12753,7 +12753,7 @@ jbm_nxf64_rational_18_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_18_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12769,7 +12769,7 @@ jbm_nxf64_rational_18_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_18_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12785,7 +12785,7 @@ jbm_nxf64_rational_18_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_18_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12801,7 +12801,7 @@ jbm_nxf64_rational_18_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_18_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12817,7 +12817,7 @@ jbm_nxf64_rational_18_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_18_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12833,7 +12833,7 @@ jbm_nxf64_rational_18_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_18_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12849,7 +12849,7 @@ jbm_nxf64_rational_18_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_18_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -12865,7 +12865,7 @@ jbm_nxf64_rational_18_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_18_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12881,7 +12881,7 @@ jbm_nxf64_rational_18_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_18_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12897,7 +12897,7 @@ jbm_nxf64_rational_18_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_18_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12913,7 +12913,7 @@ jbm_nxf64_rational_18_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_18_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12929,7 +12929,7 @@ jbm_nxf64_rational_18_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_18_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12945,7 +12945,7 @@ jbm_nxf64_rational_18_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_18_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12961,7 +12961,7 @@ jbm_nxf64_rational_18_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_18_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12977,7 +12977,7 @@ jbm_nxf64_rational_18_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_18_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_18_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -12992,7 +12992,7 @@ jbm_nxf64_rational_18_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_19_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13008,7 +13008,7 @@ jbm_nxf64_rational_19_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_19_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13024,7 +13024,7 @@ jbm_nxf64_rational_19_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_19_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13040,7 +13040,7 @@ jbm_nxf64_rational_19_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_19_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13056,7 +13056,7 @@ jbm_nxf64_rational_19_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_19_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13072,7 +13072,7 @@ jbm_nxf64_rational_19_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_19_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13088,7 +13088,7 @@ jbm_nxf64_rational_19_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_19_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13104,7 +13104,7 @@ jbm_nxf64_rational_19_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_19_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13120,7 +13120,7 @@ jbm_nxf64_rational_19_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_19_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13136,7 +13136,7 @@ jbm_nxf64_rational_19_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_19_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13152,7 +13152,7 @@ jbm_nxf64_rational_19_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_19_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13168,7 +13168,7 @@ jbm_nxf64_rational_19_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_19_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13184,7 +13184,7 @@ jbm_nxf64_rational_19_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_19_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13200,7 +13200,7 @@ jbm_nxf64_rational_19_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_19_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13216,7 +13216,7 @@ jbm_nxf64_rational_19_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_19_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13232,7 +13232,7 @@ jbm_nxf64_rational_19_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_19_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13248,7 +13248,7 @@ jbm_nxf64_rational_19_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_19_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13264,7 +13264,7 @@ jbm_nxf64_rational_19_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_19_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13280,7 +13280,7 @@ jbm_nxf64_rational_19_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_19_18 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_19_18 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13295,7 +13295,7 @@ jbm_nxf64_rational_19_18 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_20_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13311,7 +13311,7 @@ jbm_nxf64_rational_20_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_20_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13327,7 +13327,7 @@ jbm_nxf64_rational_20_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_20_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13343,7 +13343,7 @@ jbm_nxf64_rational_20_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_20_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13359,7 +13359,7 @@ jbm_nxf64_rational_20_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_20_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13375,7 +13375,7 @@ jbm_nxf64_rational_20_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_20_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13391,7 +13391,7 @@ jbm_nxf64_rational_20_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_20_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13407,7 +13407,7 @@ jbm_nxf64_rational_20_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_20_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13423,7 +13423,7 @@ jbm_nxf64_rational_20_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_20_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13439,7 +13439,7 @@ jbm_nxf64_rational_20_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_20_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13455,7 +13455,7 @@ jbm_nxf64_rational_20_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_20_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13471,7 +13471,7 @@ jbm_nxf64_rational_20_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_20_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13487,7 +13487,7 @@ jbm_nxf64_rational_20_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_20_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13503,7 +13503,7 @@ jbm_nxf64_rational_20_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_20_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13519,7 +13519,7 @@ jbm_nxf64_rational_20_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_20_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13535,7 +13535,7 @@ jbm_nxf64_rational_20_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_20_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13551,7 +13551,7 @@ jbm_nxf64_rational_20_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_20_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13567,7 +13567,7 @@ jbm_nxf64_rational_20_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_20_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13583,7 +13583,7 @@ jbm_nxf64_rational_20_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_18 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_20_18 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13599,7 +13599,7 @@ jbm_nxf64_rational_20_18 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_20_19 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_20_19 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13614,7 +13614,7 @@ jbm_nxf64_rational_20_19 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_21_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13630,7 +13630,7 @@ jbm_nxf64_rational_21_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_21_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13646,7 +13646,7 @@ jbm_nxf64_rational_21_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_21_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13662,7 +13662,7 @@ jbm_nxf64_rational_21_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_21_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13678,7 +13678,7 @@ jbm_nxf64_rational_21_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_21_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13694,7 +13694,7 @@ jbm_nxf64_rational_21_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_21_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13710,7 +13710,7 @@ jbm_nxf64_rational_21_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_21_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13726,7 +13726,7 @@ jbm_nxf64_rational_21_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_21_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13742,7 +13742,7 @@ jbm_nxf64_rational_21_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_21_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13758,7 +13758,7 @@ jbm_nxf64_rational_21_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_21_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13774,7 +13774,7 @@ jbm_nxf64_rational_21_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_21_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13790,7 +13790,7 @@ jbm_nxf64_rational_21_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_21_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13806,7 +13806,7 @@ jbm_nxf64_rational_21_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_21_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13822,7 +13822,7 @@ jbm_nxf64_rational_21_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_21_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13838,7 +13838,7 @@ jbm_nxf64_rational_21_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_21_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13854,7 +13854,7 @@ jbm_nxf64_rational_21_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_21_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13870,7 +13870,7 @@ jbm_nxf64_rational_21_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_21_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13886,7 +13886,7 @@ jbm_nxf64_rational_21_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_21_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13902,7 +13902,7 @@ jbm_nxf64_rational_21_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_18 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_21_18 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13918,7 +13918,7 @@ jbm_nxf64_rational_21_18 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_19 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_21_19 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13934,7 +13934,7 @@ jbm_nxf64_rational_21_19 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_21_20 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_21_20 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -13949,7 +13949,7 @@ jbm_nxf64_rational_21_20 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_22_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13965,7 +13965,7 @@ jbm_nxf64_rational_22_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_22_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13981,7 +13981,7 @@ jbm_nxf64_rational_22_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_22_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -13997,7 +13997,7 @@ jbm_nxf64_rational_22_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_22_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14013,7 +14013,7 @@ jbm_nxf64_rational_22_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_22_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14029,7 +14029,7 @@ jbm_nxf64_rational_22_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_22_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14045,7 +14045,7 @@ jbm_nxf64_rational_22_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_22_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14061,7 +14061,7 @@ jbm_nxf64_rational_22_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_22_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14077,7 +14077,7 @@ jbm_nxf64_rational_22_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_22_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14093,7 +14093,7 @@ jbm_nxf64_rational_22_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_22_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14109,7 +14109,7 @@ jbm_nxf64_rational_22_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14125,7 +14125,7 @@ jbm_nxf64_rational_22_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14141,7 +14141,7 @@ jbm_nxf64_rational_22_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14157,7 +14157,7 @@ jbm_nxf64_rational_22_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14173,7 +14173,7 @@ jbm_nxf64_rational_22_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14189,7 +14189,7 @@ jbm_nxf64_rational_22_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14205,7 +14205,7 @@ jbm_nxf64_rational_22_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14221,7 +14221,7 @@ jbm_nxf64_rational_22_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14237,7 +14237,7 @@ jbm_nxf64_rational_22_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_18 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_18 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14253,7 +14253,7 @@ jbm_nxf64_rational_22_18 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_19 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_19 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14269,7 +14269,7 @@ jbm_nxf64_rational_22_19 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_20 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_20 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14285,7 +14285,7 @@ jbm_nxf64_rational_22_20 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_22_21 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_22_21 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14300,7 +14300,7 @@ jbm_nxf64_rational_22_21 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_23_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14316,7 +14316,7 @@ jbm_nxf64_rational_23_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_23_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14332,7 +14332,7 @@ jbm_nxf64_rational_23_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_23_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14348,7 +14348,7 @@ jbm_nxf64_rational_23_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_23_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14364,7 +14364,7 @@ jbm_nxf64_rational_23_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_23_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14380,7 +14380,7 @@ jbm_nxf64_rational_23_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_23_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14396,7 +14396,7 @@ jbm_nxf64_rational_23_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_23_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14412,7 +14412,7 @@ jbm_nxf64_rational_23_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_23_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14428,7 +14428,7 @@ jbm_nxf64_rational_23_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_23_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14444,7 +14444,7 @@ jbm_nxf64_rational_23_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_23_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14460,7 +14460,7 @@ jbm_nxf64_rational_23_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14476,7 +14476,7 @@ jbm_nxf64_rational_23_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14492,7 +14492,7 @@ jbm_nxf64_rational_23_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14508,7 +14508,7 @@ jbm_nxf64_rational_23_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14524,7 +14524,7 @@ jbm_nxf64_rational_23_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14540,7 +14540,7 @@ jbm_nxf64_rational_23_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14556,7 +14556,7 @@ jbm_nxf64_rational_23_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14572,7 +14572,7 @@ jbm_nxf64_rational_23_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14588,7 +14588,7 @@ jbm_nxf64_rational_23_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_18 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_18 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14604,7 +14604,7 @@ jbm_nxf64_rational_23_18 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_19 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_19 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14620,7 +14620,7 @@ jbm_nxf64_rational_23_19 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_20 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_20 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14636,7 +14636,7 @@ jbm_nxf64_rational_23_20 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_21 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_21 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14652,7 +14652,7 @@ jbm_nxf64_rational_23_21 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_23_22 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_23_22 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14667,7 +14667,7 @@ jbm_nxf64_rational_23_22 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_24_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14683,7 +14683,7 @@ jbm_nxf64_rational_24_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_24_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14699,7 +14699,7 @@ jbm_nxf64_rational_24_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_24_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14715,7 +14715,7 @@ jbm_nxf64_rational_24_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_24_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14731,7 +14731,7 @@ jbm_nxf64_rational_24_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_24_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14747,7 +14747,7 @@ jbm_nxf64_rational_24_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_24_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14763,7 +14763,7 @@ jbm_nxf64_rational_24_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_24_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14779,7 +14779,7 @@ jbm_nxf64_rational_24_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_24_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14795,7 +14795,7 @@ jbm_nxf64_rational_24_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_24_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14811,7 +14811,7 @@ jbm_nxf64_rational_24_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_24_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -14827,7 +14827,7 @@ jbm_nxf64_rational_24_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14843,7 +14843,7 @@ jbm_nxf64_rational_24_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14859,7 +14859,7 @@ jbm_nxf64_rational_24_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14875,7 +14875,7 @@ jbm_nxf64_rational_24_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14891,7 +14891,7 @@ jbm_nxf64_rational_24_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14907,7 +14907,7 @@ jbm_nxf64_rational_24_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14923,7 +14923,7 @@ jbm_nxf64_rational_24_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14939,7 +14939,7 @@ jbm_nxf64_rational_24_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14955,7 +14955,7 @@ jbm_nxf64_rational_24_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_18 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_18 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14971,7 +14971,7 @@ jbm_nxf64_rational_24_18 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_19 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_19 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -14987,7 +14987,7 @@ jbm_nxf64_rational_24_19 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_20 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_20 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15003,7 +15003,7 @@ jbm_nxf64_rational_24_20 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_21 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_21 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15019,7 +15019,7 @@ jbm_nxf64_rational_24_21 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_22 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_22 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15035,7 +15035,7 @@ jbm_nxf64_rational_24_22 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_24_23 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_24_23 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15050,7 +15050,7 @@ jbm_nxf64_rational_24_23 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_25_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15066,7 +15066,7 @@ jbm_nxf64_rational_25_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_25_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15082,7 +15082,7 @@ jbm_nxf64_rational_25_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_25_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15098,7 +15098,7 @@ jbm_nxf64_rational_25_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_25_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15114,7 +15114,7 @@ jbm_nxf64_rational_25_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_25_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15130,7 +15130,7 @@ jbm_nxf64_rational_25_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_25_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15146,7 +15146,7 @@ jbm_nxf64_rational_25_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_25_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15162,7 +15162,7 @@ jbm_nxf64_rational_25_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_25_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15178,7 +15178,7 @@ jbm_nxf64_rational_25_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_25_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15194,7 +15194,7 @@ jbm_nxf64_rational_25_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_25_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15210,7 +15210,7 @@ jbm_nxf64_rational_25_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15226,7 +15226,7 @@ jbm_nxf64_rational_25_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15242,7 +15242,7 @@ jbm_nxf64_rational_25_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15258,7 +15258,7 @@ jbm_nxf64_rational_25_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15274,7 +15274,7 @@ jbm_nxf64_rational_25_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15290,7 +15290,7 @@ jbm_nxf64_rational_25_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15306,7 +15306,7 @@ jbm_nxf64_rational_25_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15322,7 +15322,7 @@ jbm_nxf64_rational_25_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15338,7 +15338,7 @@ jbm_nxf64_rational_25_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_18 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_18 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15354,7 +15354,7 @@ jbm_nxf64_rational_25_18 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_19 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_19 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15370,7 +15370,7 @@ jbm_nxf64_rational_25_19 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_20 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_20 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15386,7 +15386,7 @@ jbm_nxf64_rational_25_20 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_21 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_21 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15402,7 +15402,7 @@ jbm_nxf64_rational_25_21 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_22 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_22 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15418,7 +15418,7 @@ jbm_nxf64_rational_25_22 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_23 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_23 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15434,7 +15434,7 @@ jbm_nxf64_rational_25_23 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_25_24 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_25_24 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15449,7 +15449,7 @@ jbm_nxf64_rational_25_24 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_26_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15465,7 +15465,7 @@ jbm_nxf64_rational_26_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_26_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15481,7 +15481,7 @@ jbm_nxf64_rational_26_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_26_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15497,7 +15497,7 @@ jbm_nxf64_rational_26_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_26_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15513,7 +15513,7 @@ jbm_nxf64_rational_26_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_26_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15529,7 +15529,7 @@ jbm_nxf64_rational_26_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_26_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15545,7 +15545,7 @@ jbm_nxf64_rational_26_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_26_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15561,7 +15561,7 @@ jbm_nxf64_rational_26_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_26_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15577,7 +15577,7 @@ jbm_nxf64_rational_26_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_26_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15593,7 +15593,7 @@ jbm_nxf64_rational_26_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_26_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15609,7 +15609,7 @@ jbm_nxf64_rational_26_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15625,7 +15625,7 @@ jbm_nxf64_rational_26_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15641,7 +15641,7 @@ jbm_nxf64_rational_26_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15657,7 +15657,7 @@ jbm_nxf64_rational_26_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15673,7 +15673,7 @@ jbm_nxf64_rational_26_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15689,7 +15689,7 @@ jbm_nxf64_rational_26_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15705,7 +15705,7 @@ jbm_nxf64_rational_26_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15721,7 +15721,7 @@ jbm_nxf64_rational_26_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15737,7 +15737,7 @@ jbm_nxf64_rational_26_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_18 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_18 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15753,7 +15753,7 @@ jbm_nxf64_rational_26_18 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_19 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_19 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15769,7 +15769,7 @@ jbm_nxf64_rational_26_19 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_20 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_20 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15785,7 +15785,7 @@ jbm_nxf64_rational_26_20 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_21 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_21 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15801,7 +15801,7 @@ jbm_nxf64_rational_26_21 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_22 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_22 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15817,7 +15817,7 @@ jbm_nxf64_rational_26_22 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_23 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_23 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15833,7 +15833,7 @@ jbm_nxf64_rational_26_23 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_24 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_24 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15849,7 +15849,7 @@ jbm_nxf64_rational_26_24 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_26_25 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_26_25 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -15864,7 +15864,7 @@ jbm_nxf64_rational_26_25 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_27_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15880,7 +15880,7 @@ jbm_nxf64_rational_27_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_27_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15896,7 +15896,7 @@ jbm_nxf64_rational_27_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_27_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15912,7 +15912,7 @@ jbm_nxf64_rational_27_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_27_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15928,7 +15928,7 @@ jbm_nxf64_rational_27_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_27_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15944,7 +15944,7 @@ jbm_nxf64_rational_27_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_27_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15960,7 +15960,7 @@ jbm_nxf64_rational_27_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_27_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15976,7 +15976,7 @@ jbm_nxf64_rational_27_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_27_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -15992,7 +15992,7 @@ jbm_nxf64_rational_27_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_27_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16008,7 +16008,7 @@ jbm_nxf64_rational_27_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_27_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16024,7 +16024,7 @@ jbm_nxf64_rational_27_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16040,7 +16040,7 @@ jbm_nxf64_rational_27_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16056,7 +16056,7 @@ jbm_nxf64_rational_27_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16072,7 +16072,7 @@ jbm_nxf64_rational_27_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16088,7 +16088,7 @@ jbm_nxf64_rational_27_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16104,7 +16104,7 @@ jbm_nxf64_rational_27_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16120,7 +16120,7 @@ jbm_nxf64_rational_27_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16136,7 +16136,7 @@ jbm_nxf64_rational_27_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16152,7 +16152,7 @@ jbm_nxf64_rational_27_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_18 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_18 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16168,7 +16168,7 @@ jbm_nxf64_rational_27_18 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_19 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_19 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16184,7 +16184,7 @@ jbm_nxf64_rational_27_19 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_20 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_20 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16200,7 +16200,7 @@ jbm_nxf64_rational_27_20 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_21 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_21 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16216,7 +16216,7 @@ jbm_nxf64_rational_27_21 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_22 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_22 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16232,7 +16232,7 @@ jbm_nxf64_rational_27_22 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_23 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_23 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16248,7 +16248,7 @@ jbm_nxf64_rational_27_23 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_24 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_24 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16264,7 +16264,7 @@ jbm_nxf64_rational_27_24 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_25 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_25 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16280,7 +16280,7 @@ jbm_nxf64_rational_27_25 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_27_26 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_27_26 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16295,7 +16295,7 @@ jbm_nxf64_rational_27_26 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_28_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16311,7 +16311,7 @@ jbm_nxf64_rational_28_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_28_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16327,7 +16327,7 @@ jbm_nxf64_rational_28_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_28_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16343,7 +16343,7 @@ jbm_nxf64_rational_28_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_28_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16359,7 +16359,7 @@ jbm_nxf64_rational_28_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_28_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16375,7 +16375,7 @@ jbm_nxf64_rational_28_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_28_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16391,7 +16391,7 @@ jbm_nxf64_rational_28_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_28_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16407,7 +16407,7 @@ jbm_nxf64_rational_28_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_28_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16423,7 +16423,7 @@ jbm_nxf64_rational_28_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_28_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16439,7 +16439,7 @@ jbm_nxf64_rational_28_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_28_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16455,7 +16455,7 @@ jbm_nxf64_rational_28_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16471,7 +16471,7 @@ jbm_nxf64_rational_28_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16487,7 +16487,7 @@ jbm_nxf64_rational_28_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16503,7 +16503,7 @@ jbm_nxf64_rational_28_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16519,7 +16519,7 @@ jbm_nxf64_rational_28_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16535,7 +16535,7 @@ jbm_nxf64_rational_28_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16551,7 +16551,7 @@ jbm_nxf64_rational_28_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16567,7 +16567,7 @@ jbm_nxf64_rational_28_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16583,7 +16583,7 @@ jbm_nxf64_rational_28_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_18 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_18 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16599,7 +16599,7 @@ jbm_nxf64_rational_28_18 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_19 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_19 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16615,7 +16615,7 @@ jbm_nxf64_rational_28_19 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_20 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_20 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16631,7 +16631,7 @@ jbm_nxf64_rational_28_20 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_21 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_21 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16647,7 +16647,7 @@ jbm_nxf64_rational_28_21 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_22 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_22 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16663,7 +16663,7 @@ jbm_nxf64_rational_28_22 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_23 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_23 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16679,7 +16679,7 @@ jbm_nxf64_rational_28_23 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_24 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_24 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16695,7 +16695,7 @@ jbm_nxf64_rational_28_24 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_25 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_25 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16711,7 +16711,7 @@ jbm_nxf64_rational_28_25 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_26 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_26 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16727,7 +16727,7 @@ jbm_nxf64_rational_28_26 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_28_27 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_28_27 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16742,7 +16742,7 @@ jbm_nxf64_rational_28_27 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_0 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_29_0 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16758,7 +16758,7 @@ jbm_nxf64_rational_29_0 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_29_1 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16774,7 +16774,7 @@ jbm_nxf64_rational_29_1 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_29_2 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16790,7 +16790,7 @@ jbm_nxf64_rational_29_2 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_3 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_29_3 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16806,7 +16806,7 @@ jbm_nxf64_rational_29_3 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_4 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_29_4 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16822,7 +16822,7 @@ jbm_nxf64_rational_29_4 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_5 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_29_5 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16838,7 +16838,7 @@ jbm_nxf64_rational_29_5 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_6 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_29_6 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16854,7 +16854,7 @@ jbm_nxf64_rational_29_6 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_7 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_29_7 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16870,7 +16870,7 @@ jbm_nxf64_rational_29_7 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_8 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_29_8 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16886,7 +16886,7 @@ jbm_nxf64_rational_29_8 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_9 (svbool_t pg,   ///< predicate.
+jbm_nxf64_rational_29_9 (const svbool_t pg,   ///< predicate.
                          const svfloat64_t x,   ///< svfloat64_t vector.
                          const double *p)       ///< array of coefficients.
 {
@@ -16902,7 +16902,7 @@ jbm_nxf64_rational_29_9 (svbool_t pg,   ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_10 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_10 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16918,7 +16918,7 @@ jbm_nxf64_rational_29_10 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_11 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_11 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16934,7 +16934,7 @@ jbm_nxf64_rational_29_11 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_12 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_12 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16950,7 +16950,7 @@ jbm_nxf64_rational_29_12 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_13 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_13 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16966,7 +16966,7 @@ jbm_nxf64_rational_29_13 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_14 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_14 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16982,7 +16982,7 @@ jbm_nxf64_rational_29_14 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_15 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_15 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -16998,7 +16998,7 @@ jbm_nxf64_rational_29_15 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_16 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_16 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17014,7 +17014,7 @@ jbm_nxf64_rational_29_16 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_17 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_17 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17030,7 +17030,7 @@ jbm_nxf64_rational_29_17 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_18 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_18 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17046,7 +17046,7 @@ jbm_nxf64_rational_29_18 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_19 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_19 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17062,7 +17062,7 @@ jbm_nxf64_rational_29_19 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_20 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_20 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17078,7 +17078,7 @@ jbm_nxf64_rational_29_20 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_21 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_21 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17094,7 +17094,7 @@ jbm_nxf64_rational_29_21 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_22 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_22 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17110,7 +17110,7 @@ jbm_nxf64_rational_29_22 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_23 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_23 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17126,7 +17126,7 @@ jbm_nxf64_rational_29_23 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_24 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_24 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17142,7 +17142,7 @@ jbm_nxf64_rational_29_24 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_25 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_25 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17158,7 +17158,7 @@ jbm_nxf64_rational_29_25 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_26 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_26 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17174,7 +17174,7 @@ jbm_nxf64_rational_29_26 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_27 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_27 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17190,7 +17190,7 @@ jbm_nxf64_rational_29_27 (svbool_t pg,  ///< predicate.
  * \return svfloat64_t vector of rational values.
  */
 static inline svfloat64_t
-jbm_nxf64_rational_29_28 (svbool_t pg,  ///< predicate.
+jbm_nxf64_rational_29_28 (const svbool_t pg,  ///< predicate.
                           const svfloat64_t x,  ///< svfloat64_t vector.
                           const double *p)      ///< array of coefficients.
 {
@@ -17206,7 +17206,7 @@ jbm_nxf64_rational_29_28 (svbool_t pg,  ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_cbrtwc (svbool_t pg,  ///< predicate.
+jbm_nxf64_cbrtwc (const svbool_t pg,  ///< predicate.
                   const svfloat64_t x)
                   ///< svfloat64_t vector \f$\in[1/2,1]\f$.
 {
@@ -17219,7 +17219,7 @@ jbm_nxf64_cbrtwc (svbool_t pg,  ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_cbrt (svbool_t pg,    ///< predicate.
+jbm_nxf64_cbrt (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   const svfloat64_t xa = svabs_f64_x (pg, x);
@@ -17250,7 +17250,7 @@ jbm_nxf64_cbrt (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_expm1wc (svbool_t pg, ///< predicate.
+jbm_nxf64_expm1wc (const svbool_t pg, ///< predicate.
                    const svfloat64_t x)
                    ///< svfloat64_t vector \f$\in[-\log 2/2,\log 2/2]\f$.
 {
@@ -17264,7 +17264,7 @@ jbm_nxf64_expm1wc (svbool_t pg, ///< predicate.
  * \return function value.
  */
 static inline svfloat64_t
-jbm_nxf64_exp2wc (svbool_t pg,  ///< predicate.
+jbm_nxf64_exp2wc (const svbool_t pg,  ///< predicate.
                   const svfloat64_t x)
                   ///< svfloat64_t vector \f$\in[1/2,1]\f$.
 {
@@ -17278,7 +17278,7 @@ jbm_nxf64_exp2wc (svbool_t pg,  ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_exp2 (svbool_t pg,    ///< predicate.
+jbm_nxf64_exp2 (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   const svint64_t i = jbm_nxf64_floor (pg, x);
@@ -17292,7 +17292,7 @@ jbm_nxf64_exp2 (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_exp (svbool_t pg,     ///< predicate.
+jbm_nxf64_exp (const svbool_t pg,     ///< predicate.
                const svfloat64_t x)     ///< svfloat64_t vector.
 {
   return jbm_nxf64_exp2 (pg, svmul_n_f64_x (pg, x, M_LOG2E));
@@ -17305,7 +17305,7 @@ jbm_nxf64_exp (svbool_t pg,     ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_exp10 (svbool_t pg,   ///< predicate.
+jbm_nxf64_exp10 (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_exp2 (pg, svmul_n_f64_x (pg, x, M_LN10 / M_LN2));
@@ -17318,7 +17318,7 @@ jbm_nxf64_exp10 (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_expm1 (svbool_t pg,   ///< predicate.
+jbm_nxf64_expm1 (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t vector.
 {
   const svbool_t m_small
@@ -17334,7 +17334,7 @@ jbm_nxf64_expm1 (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_log2wc (svbool_t pg,  ///< predicate.
+jbm_nxf64_log2wc (const svbool_t pg,  ///< predicate.
                   const svfloat64_t x)
                   ///< svfloat64_t vector \f$\in[0.5,1]\f$.
 {
@@ -17348,7 +17348,7 @@ jbm_nxf64_log2wc (svbool_t pg,  ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_log2 (svbool_t pg,    ///< predicate.
+jbm_nxf64_log2 (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   svfloat64_t y, y2;
@@ -17376,7 +17376,7 @@ jbm_nxf64_log2 (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_log (svbool_t pg,     ///< predicate.
+jbm_nxf64_log (const svbool_t pg,     ///< predicate.
                const svfloat64_t x)     ///< svfloat64_t vector.
 {
   return svmul_n_f64_x (pg, jbm_nxf64_log2 (pg, x), M_LN2);
@@ -17389,7 +17389,7 @@ jbm_nxf64_log (svbool_t pg,     ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_log10 (svbool_t pg,   ///< predicate.
+jbm_nxf64_log10 (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return svmul_n_f64_x (pg, jbm_nxf64_log2 (pg, x), M_LN2 / M_LN10);
@@ -17402,7 +17402,7 @@ jbm_nxf64_log10 (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t) (vfloat64m1_t).
  */
 static inline svfloat64_t
-jbm_nxf64_pown (svbool_t pg,    ///< predicate.
+jbm_nxf64_pown (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x,    ///< svfloat64_t vector.
                 int e)          ///< exponent (int).
 {
@@ -17426,7 +17426,7 @@ jbm_nxf64_pown (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_pow1 (svbool_t pg,    ///< predicate.
+jbm_nxf64_pow1 (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x,    ///< svfloat64_t vector.
                 const double e) ///< exponent (double).
 {
@@ -17440,7 +17440,7 @@ jbm_nxf64_pow1 (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_pow (svbool_t pg,     ///< predicate.
+jbm_nxf64_pow (const svbool_t pg,     ///< predicate.
                const svfloat64_t x,     ///< svfloat64_t vector.
                const svfloat64_t e)     ///< exponent (svfloat64_t).
 {
@@ -17454,7 +17454,7 @@ jbm_nxf64_pow (svbool_t pg,     ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_sinwc (svbool_t pg,   ///< predicate.
+jbm_nxf64_sinwc (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)
                  ///< svfloat64_t vector \f$\in[-\pi/4,\pi/4]\f$.
 {
@@ -17470,7 +17470,7 @@ jbm_nxf64_sinwc (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_coswc (svbool_t pg,   ///< predicate.
+jbm_nxf64_coswc (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)
                  ///< svfloat64_t vector \f$\in[-\pi/4,\pi/4]\f$.
 {
@@ -17484,7 +17484,7 @@ jbm_nxf64_coswc (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_tanwc (svbool_t pg,   ///< predicate.
+jbm_nxf64_tanwc (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)
                  ///< svfloat64_t vector \f$\in[-\pi/4,\pi/4]\f$.
 {
@@ -17498,7 +17498,7 @@ jbm_nxf64_tanwc (svbool_t pg,   ///< predicate.
  * x in [-pi/4,pi/4] from jbm_nxf64_sinwc approximation (svfloat64_t).
  */
 static inline void
-jbm_nxf64_sincoswc (svbool_t pg,        ///< predicate.
+jbm_nxf64_sincoswc (const svbool_t pg,        ///< predicate.
                     const svfloat64_t x,
                     ///< svfloat64_t vector \f$\in[-\pi/4,\pi/4]\f$.
                     svfloat64_t *s,     ///< pointer to sin value.
@@ -17516,7 +17516,7 @@ jbm_nxf64_sincoswc (svbool_t pg,        ///< predicate.
  * \return reduced vector (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_trig (svbool_t pg,    ///< predicate.
+jbm_nxf64_trig (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x,    ///< svfloat64_t vector.
                 svint64_t *q)   ///< pointer to quadrant (svint64_t).
 {
@@ -17532,7 +17532,7 @@ jbm_nxf64_trig (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_sin (svbool_t pg,     ///< predicate.
+jbm_nxf64_sin (const svbool_t pg,     ///< predicate.
                const svfloat64_t x)     ///< svfloat64_t vector.
 {
   svfloat64_t y, s, c;
@@ -17553,7 +17553,7 @@ jbm_nxf64_sin (svbool_t pg,     ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_cos (svbool_t pg,     ///< predicate.
+jbm_nxf64_cos (const svbool_t pg,     ///< predicate.
                const svfloat64_t x)     ///< svfloat64_t vector.
 {
   svfloat64_t y, s, c;
@@ -17573,7 +17573,7 @@ jbm_nxf64_cos (svbool_t pg,     ///< predicate.
  * jbm_nxf64_sinwc and jbm_nxf64_coswc approximations (svfloat64_t).
  */
 static inline void
-jbm_nxf64_sincos (svbool_t pg,  ///< predicate.
+jbm_nxf64_sincos (const svbool_t pg,  ///< predicate.
                   const svfloat64_t x,  ///< svfloat64_t vector.
                   svfloat64_t *s,       ///< pointer to sin value.
                   svfloat64_t *c)       ///< pointer to cos value.
@@ -17600,7 +17600,7 @@ jbm_nxf64_sincos (svbool_t pg,  ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_tan (svbool_t pg,     ///< predicate.
+jbm_nxf64_tan (const svbool_t pg,     ///< predicate.
                const svfloat64_t x)     ///< svfloat64_t vector.
 {
   svfloat64_t y, z;
@@ -17619,7 +17619,7 @@ jbm_nxf64_tan (svbool_t pg,     ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_atanwc (svbool_t pg,  ///< predicate.
+jbm_nxf64_atanwc (const svbool_t pg,  ///< predicate.
                   const svfloat64_t x)  ///< svfloat64_t vector \f$\in[-1,1]\f$.
 {
   return svmul_f64_x (pg, x,
@@ -17634,7 +17634,7 @@ jbm_nxf64_atanwc (svbool_t pg,  ///< predicate.
  * \return function value (svfloat64_t in [-pi/2,pi/2]).
  */
 static inline svfloat64_t
-jbm_nxf64_atan (svbool_t pg,    ///< predicate.
+jbm_nxf64_atan (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   svfloat64_t f, ax;
@@ -17654,7 +17654,7 @@ jbm_nxf64_atan (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t in [-pi,pi]).
  */
 static inline svfloat64_t
-jbm_nxf64_atan2 (svbool_t pg,   ///< predicate.
+jbm_nxf64_atan2 (const svbool_t pg,   ///< predicate.
                  const svfloat64_t y,   ///< svfloat64_t y component.
                  const svfloat64_t x)   ///< svfloat64_t x component.
 {
@@ -17674,7 +17674,7 @@ jbm_nxf64_atan2 (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t in [-pi/2,pi/2]).
  */
 static inline svfloat64_t
-jbm_nxf64_asin (svbool_t pg,    ///< predicate.
+jbm_nxf64_asin (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   return
@@ -17691,7 +17691,7 @@ jbm_nxf64_asin (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t in [0,pi]).
  */
 static inline svfloat64_t
-jbm_nxf64_acos (svbool_t pg,    ///< predicate.
+jbm_nxf64_acos (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   const svfloat64_t k1 = svdup_n_f64 (1.);
@@ -17707,7 +17707,7 @@ jbm_nxf64_acos (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_sinh (svbool_t pg,    ///< predicate.
+jbm_nxf64_sinh (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   const svfloat64_t f = jbm_nxf64_expm1 (pg, jbm_nxf64_abs (pg, x));
@@ -17726,7 +17726,7 @@ jbm_nxf64_sinh (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_cosh (svbool_t pg,    ///< predicate.
+jbm_nxf64_cosh (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   const svfloat64_t f = jbm_nxf64_exp (pg, x);
@@ -17740,7 +17740,7 @@ jbm_nxf64_cosh (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_tanh (svbool_t pg,    ///< predicate.
+jbm_nxf64_tanh (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   const svfloat64_t x2 = jbm_nxf64_dbl (pg, x);
@@ -17758,7 +17758,7 @@ jbm_nxf64_tanh (svbool_t pg,    ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_asinh (svbool_t pg,   ///< predicate.
+jbm_nxf64_asinh (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t vector.
 {
   const svfloat64_t t
@@ -17772,7 +17772,7 @@ jbm_nxf64_asinh (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_acosh (svbool_t pg,   ///< predicate.
+jbm_nxf64_acosh (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t vector.
 {
   const svfloat64_t t
@@ -17786,7 +17786,7 @@ jbm_nxf64_acosh (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_atanh (svbool_t pg,   ///< predicate.
+jbm_nxf64_atanh (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t vector.
 {
   const svfloat64_t u = svdup_n_f64 (1.);
@@ -17805,7 +17805,7 @@ jbm_nxf64_atanh (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_erfwc (svbool_t pg,   ///< predicate.
+jbm_nxf64_erfwc (const svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t vector \f$\in[-1,1]\f$.
 {
   return
@@ -17821,7 +17821,7 @@ jbm_nxf64_erfwc (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_erfcwc (svbool_t pg,  ///< predicate.
+jbm_nxf64_erfcwc (const svbool_t pg,  ///< predicate.
                   const svfloat64_t x)
                   ///< svfloat64_t vector \f$\in[1,\infty)\f$.
 {
@@ -17845,7 +17845,7 @@ jbm_nxf64_erfcwc (svbool_t pg,  ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_erf (svbool_t pg,     ///< predicate.
+jbm_nxf64_erf (const svbool_t pg,     ///< predicate.
                const svfloat64_t x)     ///< svfloat64_t vector.
 {
   const svfloat64_t ax = jbm_nxf64_abs (pg, x);
@@ -17864,7 +17864,7 @@ jbm_nxf64_erf (svbool_t pg,     ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_erfc (svbool_t pg,    ///< predicate.
+jbm_nxf64_erfc (const svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   const svfloat64_t ax = jbm_nxf64_abs (pg, x);
@@ -17887,7 +17887,7 @@ jbm_nxf64_erfc (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of solution values.
  */
 static inline svfloat64_t
-jbm_nxf64_solve_quadratic_reduced (svbool_t pg, ///< predicate.
+jbm_nxf64_solve_quadratic_reduced (const svbool_t pg, ///< predicate.
                                    svfloat64_t a,
 ///< svfloat64_t vector of 1st order coefficient of the equations.
                                    svfloat64_t b,
@@ -17914,7 +17914,7 @@ jbm_nxf64_solve_quadratic_reduced (svbool_t pg, ///< predicate.
  * \return svfloat64_t vector of solution values.
  */
 static inline svfloat64_t
-jbm_nxf64_solve_quadratic (svbool_t pg, ///< predicate.
+jbm_nxf64_solve_quadratic (const svbool_t pg, ///< predicate.
                            svfloat64_t a,
 ///< svfloat64_t vector of 2nd order coefficient of the equations.
                            svfloat64_t b,
@@ -17942,7 +17942,7 @@ jbm_nxf64_solve_quadratic (svbool_t pg, ///< predicate.
  * \return svfloat64_t vector of solution values.
  */
 static inline svfloat64_t
-jbm_nxf64_solve_cubic_reduced (svbool_t pg,     ///< predicate.
+jbm_nxf64_solve_cubic_reduced (const svbool_t pg,     ///< predicate.
                                svfloat64_t a,
 ///< svfloat64_t vector of 2nd order coefficient of the equations.
                                svfloat64_t b,
@@ -18008,7 +18008,7 @@ jbm_nxf64_solve_cubic_reduced (svbool_t pg,     ///< predicate.
  * \return svfloat64_t vector of solution values.
  */
 static inline svfloat64_t
-jbm_nxf64_solve_cubic (svbool_t pg,     ///< predicate.
+jbm_nxf64_solve_cubic (const svbool_t pg,     ///< predicate.
                        svfloat64_t a,
 ///< svfloat64_t vector of 3rd order coefficient of the equations.
                        svfloat64_t b,
@@ -18038,7 +18038,7 @@ jbm_nxf64_solve_cubic (svbool_t pg,     ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter_total (svbool_t pg __attribute__((unused)),
+jbm_nxf64_flux_limiter_total (const svbool_t pg __attribute__((unused)),
                               ///< predicate.
                               const svfloat64_t d1 __attribute__((unused)),
                               ///< 1st flux limiter function parameter.
@@ -18055,7 +18055,7 @@ jbm_nxf64_flux_limiter_total (svbool_t pg __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter_null (svbool_t pg __attribute__((unused)),
+jbm_nxf64_flux_limiter_null (const svbool_t pg __attribute__((unused)),
                              ///< predicate.
                              const svfloat64_t d1 __attribute__((unused)),
                              ///< 1st flux limiter function parameter.
@@ -18072,7 +18072,7 @@ jbm_nxf64_flux_limiter_null (svbool_t pg __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter_centred (svbool_t pg,    ///< predicate.
+jbm_nxf64_flux_limiter_centred (const svbool_t pg,    ///< predicate.
                                 const svfloat64_t d1,
                                 ///< 1st flux limiter function parameter.
                                 const svfloat64_t d2)
@@ -18091,7 +18091,7 @@ jbm_nxf64_flux_limiter_centred (svbool_t pg,    ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter_superbee (svbool_t pg,   ///< predicate.
+jbm_nxf64_flux_limiter_superbee (const svbool_t pg,   ///< predicate.
                                  const svfloat64_t d1,
                                  ///< 1st flux limiter function parameter.
                                  const svfloat64_t d2)
@@ -18113,7 +18113,7 @@ jbm_nxf64_flux_limiter_superbee (svbool_t pg,   ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter_minmod (svbool_t pg,     ///< predicate.
+jbm_nxf64_flux_limiter_minmod (const svbool_t pg,     ///< predicate.
                                const svfloat64_t d1,
                                ///< 1st flux limiter function parameter.
                                const svfloat64_t d2)
@@ -18134,7 +18134,7 @@ jbm_nxf64_flux_limiter_minmod (svbool_t pg,     ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter_VanLeer (svbool_t pg,    ///< predicate.
+jbm_nxf64_flux_limiter_VanLeer (const svbool_t pg,    ///< predicate.
                                 const svfloat64_t d1,
                                 ///< 1st flux limiter function parameter.
                                 const svfloat64_t d2)
@@ -18156,7 +18156,7 @@ jbm_nxf64_flux_limiter_VanLeer (svbool_t pg,    ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter_VanAlbada (svbool_t pg,  ///< predicate.
+jbm_nxf64_flux_limiter_VanAlbada (const svbool_t pg,  ///< predicate.
                                   const svfloat64_t d1,
                                   ///< 1st flux limiter function parameter.
                                   const svfloat64_t d2)
@@ -18178,7 +18178,7 @@ jbm_nxf64_flux_limiter_VanAlbada (svbool_t pg,  ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter_minsuper (svbool_t pg,   ///< predicate.
+jbm_nxf64_flux_limiter_minsuper (const svbool_t pg,   ///< predicate.
                                  const svfloat64_t d1,
                                  ///< 1st flux limiter function parameter.
                                  const svfloat64_t d2)
@@ -18198,7 +18198,7 @@ jbm_nxf64_flux_limiter_minsuper (svbool_t pg,   ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter_supermin (svbool_t pg,   ///< predicate.
+jbm_nxf64_flux_limiter_supermin (const svbool_t pg,   ///< predicate.
                                  const svfloat64_t d1,
                                  ///< 1st flux limiter function parameter.
                                  const svfloat64_t d2)
@@ -18220,7 +18220,7 @@ jbm_nxf64_flux_limiter_supermin (svbool_t pg,   ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter_monotonized_central (svbool_t pg,        ///< predicate.
+jbm_nxf64_flux_limiter_monotonized_central (const svbool_t pg,        ///< predicate.
                                             const svfloat64_t d1,
 ///< 1st flux limiter function parameter.
                                             const svfloat64_t d2)
@@ -18243,7 +18243,7 @@ jbm_nxf64_flux_limiter_monotonized_central (svbool_t pg,        ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter_mean (svbool_t pg,       ///< predicate.
+jbm_nxf64_flux_limiter_mean (const svbool_t pg,       ///< predicate.
                              const svfloat64_t d1,
                              ///< 1st flux limiter function parameter.
                              const svfloat64_t d2)
@@ -18261,7 +18261,7 @@ jbm_nxf64_flux_limiter_mean (svbool_t pg,       ///< predicate.
  * \return flux limiter function value.
  */
 static inline svfloat64_t
-jbm_nxf64_flux_limiter (svbool_t pg,    ///< predicate.
+jbm_nxf64_flux_limiter (const svbool_t pg,    ///< predicate.
                         const svfloat64_t d1,
                         ///< 1st flux limiter function parameter.
                         const svfloat64_t d2,
@@ -18302,7 +18302,7 @@ jbm_nxf64_flux_limiter (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of integral values.
  */
 static inline svfloat64_t
-jbm_nxf64_integral (svbool_t pg,        ///< predicate.
+jbm_nxf64_integral (const svbool_t pg,        ///< predicate.
                     svfloat64_t (*f) (svbool_t, const svfloat64_t),
                     ///< pointer to the function to integrate.
                     const svfloat64_t x1,       ///< left limit of the interval.
@@ -24936,7 +24936,7 @@ jbm_4xf32_flux_limiter (const svfloat32_t d1,
  * \return svfloat32_t vector of integral values.
  */
 static inline svfloat32_t
-jbm_4xf32_integral (svfloat32_t (*f) (const svfloat32_t, const size_t),
+jbm_4xf32_integral (svfloat32_t (*f) (svbool_t, const svfloat32_t),
                     ///< pointer to the function to integrate.
                     const svfloat32_t x1,       ///< left limit of the interval.
                     const svfloat32_t x2)
@@ -31552,7 +31552,7 @@ jbm_2xf64_flux_limiter (const svfloat64_t d1,
  * \return svfloat64_t vector of integral values.
  */
 static inline svfloat64_t
-jbm_2xf64_integral (svfloat64_t (*f) (const svfloat64_t, const size_t),
+jbm_2xf64_integral (svfloat64_t (*f) (const svbool_t, const svfloat64_t),
                     ///< pointer to the function to integrate.
                     const svfloat64_t x1,       ///< left limit of the interval.
                     const svfloat64_t x2)
@@ -38168,7 +38168,7 @@ jbm_8xf32_flux_limiter (const svfloat32_t d1,
  * \return svfloat32_t vector of integral values.
  */
 static inline svfloat32_t
-jbm_8xf32_integral (svfloat32_t (*f) (const svfloat32_t, const size_t),
+jbm_8xf32_integral (svfloat32_t (*f) (svbool_t, const svfloat32_t),
                     ///< pointer to the function to integrate.
                     const svfloat32_t x1,       ///< left limit of the interval.
                     const svfloat32_t x2)
@@ -44784,7 +44784,7 @@ jbm_4xf64_flux_limiter (const svfloat64_t d1,
  * \return svfloat64_t vector of integral values.
  */
 static inline svfloat64_t
-jbm_4xf64_integral (svfloat64_t (*f) (const svfloat64_t, const size_t),
+jbm_4xf64_integral (svfloat64_t (*f) (const svbool_t, const svfloat64_t),
                     ///< pointer to the function to integrate.
                     const svfloat64_t x1,       ///< left limit of the interval.
                     const svfloat64_t x2)
@@ -51402,7 +51402,7 @@ jbm_16xf32_flux_limiter (const svfloat32_t d1,
  * \return svfloat32_t vector of integral values.
  */
 static inline svfloat32_t
-jbm_16xf32_integral (svfloat32_t (*f) (const svfloat32_t, const size_t),
+jbm_16xf32_integral (svfloat32_t (*f) (svbool_t, const svfloat32_t),
                      ///< pointer to the function to integrate.
                      const svfloat32_t x1,      ///< left limit of the interval.
                      const svfloat32_t x2)
@@ -58018,7 +58018,7 @@ jbm_8xf64_flux_limiter (const svfloat64_t d1,
  * \return svfloat64_t vector of integral values.
  */
 static inline svfloat64_t
-jbm_8xf64_integral (svfloat64_t (*f) (const svfloat64_t, const size_t),
+jbm_8xf64_integral (svfloat32_t (*f) (svbool_t, const svfloat64_t),
                     ///< pointer to the function to integrate.
                     const svfloat64_t x1,       ///< left limit of the interval.
                     const svfloat64_t x2)
