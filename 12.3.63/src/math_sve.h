@@ -18489,7 +18489,7 @@ jbm_4xf32_ldexp (const svfloat32_t x,   ///< svfloat32_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline svbool32_t
+static inline svbool_t
 jbm_4xf32_small (const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_small (svptrue_pat_b32 (SV_VL4), x);
@@ -25104,7 +25104,7 @@ jbm_2xf64_ldexp (const svfloat64_t x,   ///< svfloat64_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline svbool64_t
+static inline svbool_t
 jbm_2xf64_small (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_small (svptrue_pat_b64 (SV_VL2), x);
@@ -31720,7 +31720,7 @@ jbm_8xf32_ldexp (const svfloat32_t x,   ///< svfloat32_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline svbool32_t
+static inline svbool_t
 jbm_8xf32_small (const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_small (svptrue_pat_b32 (SV_VL8), x);
@@ -38174,7 +38174,7 @@ jbm_8xf32_integral (svfloat32_t (*f) (const svfloat32_t, const size_t),
                     const svfloat32_t x2)
                     ///< right limit of the interval.
 {
-  return jbm_nxf32_integral (svptrue_pat_b32 (SV_VL8), f, x1, x2);
+  return jbm_xf32_integral (svptrue_pat_b32 (SV_VL8), f, x1, x2);
 }
 
 /**
@@ -38336,7 +38336,7 @@ jbm_4xf64_ldexp (const svfloat64_t x,   ///< svfloat64_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline svbool64_t
+static inline svbool_t
 jbm_4xf64_small (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_small (svptrue_pat_b64 (SV_VL4), x);
@@ -44953,7 +44953,7 @@ jbm_16xf32_ldexp (const svfloat32_t x,  ///< svfloat32_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline svbool32_t
+static inline svbool_t
 jbm_16xf32_small (const svfloat32_t x)  ///< svfloat32_t vector.
 {
   return jbm_nxf32_small (svptrue_pat_b32 (SV_VL16), x);
@@ -51570,7 +51570,7 @@ jbm_8xf64_ldexp (const svfloat64_t x,   ///< svfloat64_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline svbool64_t
+static inline svbool_t
 jbm_8xf64_small (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_small (svptrue_pat_b64 (SV_VL8), x);
@@ -58046,7 +58046,7 @@ jbm_array_f32_sqrt (float *xr,  ///< result float array.
                     const float *xd,    ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, svld1_f32, svst1_f32, svsqrt_f32);
+  JBM_ARRAY_OP (xr, xd, n, float, svld1_f32, svst1_f32, svsqrt_f32_x);
 }
 
 /**
@@ -58753,7 +58753,7 @@ jbm_array_f64_sqrt (double *xr, ///< result double array.
                     const double *xd,   ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, svld1_f64, svst1_f64, svsqrt_f64);
+  JBM_ARRAY_OP (xr, xd, n, double, svld1_f64, svst1_f64, svsqrt_f64_x);
 }
 
 /**
@@ -59336,7 +59336,8 @@ jbm_array_f64_fmadd1 (double *xr,       ///< result double array.
                       const double *x3, ///< addend double array.
                       const unsigned int n)     ///< number of array elements.
 {
-  JBM_ARRAY_OP21 (xr, x1, x2, x3, n, double, svld1_f64, svst1_f64, svmla_n_f64);
+  JBM_ARRAY_OP21 (xr, x1, x2, x3, n, double, svld1_f64, svst1_f64,
+                  svmla_n_f64_x);
 }
 
 /**
@@ -59367,7 +59368,7 @@ jbm_array_f64_fmsub1 (double *xr,       ///< result double array.
                       const unsigned int n)     ///< number of array elements.
 {
   JBM_ARRAY_OP21 (xr, x1, x2, x3, n, double, svld1_f64, svst1_f64,
-                  svnmls_n_f64);
+                  svnmls_n_f64_x);
 }
 
 /**
@@ -59411,7 +59412,7 @@ jbm_array_f64_fnmadd (double *xr,       ///< result double array.
                       const double *x3, ///< addend double array.
                       const unsigned int n)     ///< number of array elements.
 {
-  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, double, svld1_f64, svst1_f64, svmls_f64);
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, double, svld1_f64, svst1_f64, svmls_f64_x);
 }
 
 /**
@@ -59425,7 +59426,7 @@ jbm_array_f64_fmsub (double *xr,        ///< result double array.
                      const double *x3,  ///< subtrahend double array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, double, svld1_f64, svst1_f64, svmla_f64);
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, double, svld1_f64, svst1_f64, svmla_f64_x);
 }
 
 /**
