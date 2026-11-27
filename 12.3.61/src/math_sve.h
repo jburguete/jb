@@ -9245,7 +9245,7 @@ jbm_nxf32_flux_limiter_total (svbool_t pg __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline svfloat32_t
-jbm_nxf32_flux_limiter_null (svbool_t pg, __attribute__((unused)),
+jbm_nxf32_flux_limiter_null (svbool_t pg __attribute__((unused)),
                              ///< predicate.
                              const svfloat32_t d1 __attribute__((unused)),
                              ///< 1st flux limiter function parameter.
@@ -9679,7 +9679,6 @@ jbm_nxf64_frexp (svbool_t pg,   ///< predicate.
                                JBM_F64_BIAS + 52ull),
                 svsub_n_s64_x (pg, svreinterpret_s64_u64 (yi), JBM_F64_BIAS)),
      m_special, 0);
-  *e = svdup_n_s64_m (en, m_special, 0ll);
   // Mantissa
   return
     svsel_f64
@@ -18378,7 +18377,7 @@ jbm_4xf32_copysign (const svfloat32_t x,
                     const svfloat32_t y)
                     ///< svfloat32_t vector to preserve sign.
 {
-  return jbm_nxf32_copysign (svptrue_pat_b32 (SV_VL4), x, y);
+  return jbm_nxf32_copysign (x, y);
 }
 
 /**
@@ -18396,9 +18395,9 @@ jbm_4xf32_hypot (const svfloat32_t x,   ///< 1st svfloat32_t vector.
 /**
  * Function to rounding to nearest (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_4xf32_round (const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_round (svptrue_pat_b32 (SV_VL4), x);
@@ -18407,9 +18406,9 @@ jbm_4xf32_round (const svfloat32_t x)   ///< svfloat32_t vector.
 /**
  * Function to rounding towards zero (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_trunc_4xf32 (const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_trunc (svptrue_pat_b32 (SV_VL4), x);
@@ -18418,9 +18417,9 @@ jbm_trunc_4xf32 (const svfloat32_t x)   ///< svfloat32_t vector.
 /**
  * Function to rounding down (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_4xf32_floor (const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_floor (svptrue_pat_b32 (SV_VL4), x);
@@ -18429,9 +18428,9 @@ jbm_4xf32_floor (const svfloat32_t x)   ///< svfloat32_t vector.
 /**
  * Function to rounding top (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_4xf32_ceil (const svfloat32_t x)    ///< svfloat32_t vector.
 {
   return jbm_nxf32_floor (svptrue_pat_b32 (SV_VL4), x);
@@ -18456,19 +18455,19 @@ jbm_4xf32_mod (const svfloat32_t x,     ///< dividend (svfloat32_t).
  */
 static inline svfloat32_t
 jbm_4xf32_frexp (const svfloat32_t x,   ///< svfloat32_t vector.
-                 vint32m1_t *e) ///< pointer to the extracted exponents vector.
+                 svint32_t *e) ///< pointer to the extracted exponents vector.
 {
   return jbm_nxf32_frexp (svptrue_pat_b32 (SV_VL4), x, e);
 }
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (4x vint32m1_t).
+ * (4x svint32_t).
  *
  * \return function value (4x svfloat32_t).
  */
 static inline svfloat32_t
-jbm_4xf32_exp2n (vint32m1_t e)  ///< exponent vector (4x vint32m1_t).
+jbm_4xf32_exp2n (svint32_t e)  ///< exponent vector (4x svint32_t).
 {
   return jbm_nxf32_exp2n (svptrue_pat_b32 (SV_VL4), e);
 }
@@ -18480,7 +18479,7 @@ jbm_4xf32_exp2n (vint32m1_t e)  ///< exponent vector (4x vint32m1_t).
  */
 static inline svfloat32_t
 jbm_4xf32_ldexp (const svfloat32_t x,   ///< svfloat32_t vector.
-                 vint32m1_t e)  ///< exponent vector (vint32m1_t).
+                 svint32_t e)  ///< exponent vector (svint32_t).
 {
   return jbm_nxf32_ldexp (svptrue_pat_b32 (SV_VL4), x, e);
 }
@@ -24993,7 +24992,7 @@ jbm_2xf64_copysign (const svfloat64_t x,
                     const svfloat64_t y)
                     ///< svfloat64_t vector to preserve sign.
 {
-  return jbm_nxf64_copysign (svptrue_pat_b64 (SV_VL2), x, y);
+  return jbm_nxf64_copysign (x, y);
 }
 
 /**
@@ -25011,9 +25010,9 @@ jbm_2xf64_hypot (const svfloat64_t x,   ///< 1st svfloat64_t vector.
 /**
  * Function to rounding to nearest (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_2xf64_round (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_round (svptrue_pat_b64 (SV_VL2), x);
@@ -25022,9 +25021,9 @@ jbm_2xf64_round (const svfloat64_t x)   ///< svfloat64_t vector.
 /**
  * Function to rounding towards zero (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_2xf64_trunc (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_trunc (svptrue_pat_b64 (SV_VL2), x);
@@ -25033,9 +25032,9 @@ jbm_2xf64_trunc (const svfloat64_t x)   ///< svfloat64_t vector.
 /**
  * Function to rounding down (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_2xf64_floor (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_floor (svptrue_pat_b64 (SV_VL2), x);
@@ -25044,9 +25043,9 @@ jbm_2xf64_floor (const svfloat64_t x)   ///< svfloat64_t vector.
 /**
  * Function to rounding top (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_2xf64_ceil (const svfloat64_t x)    ///< svfloat64_t vector.
 {
   return jbm_nxf64_floor (svptrue_pat_b64 (SV_VL2), x);
@@ -25071,19 +25070,19 @@ jbm_2xf64_mod (const svfloat64_t x,     ///< dividend (svfloat64_t).
  */
 static inline svfloat64_t
 jbm_2xf64_frexp (const svfloat64_t x,   ///< svfloat64_t vector.
-                 vint64m1_t *e) ///< pointer to the extracted exponents vector.
+                 svint64_t *e) ///< pointer to the extracted exponents vector.
 {
   return jbm_nxf64_frexp (svptrue_pat_b64 (SV_VL2), x, e);
 }
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (2x vint64m1_t).
+ * (2x svint64_t).
  *
  * \return function value (2x svfloat64_t).
  */
 static inline svfloat64_t
-jbm_2xf64_exp2n (vint64m1_t e)  ///< exponent vector (2x vint64m1_t).
+jbm_2xf64_exp2n (svint64_t e)  ///< exponent vector (2x svint64_t).
 {
   return jbm_nxf64_exp2n (svptrue_pat_b64 (SV_VL2), e);
 }
@@ -25095,7 +25094,7 @@ jbm_2xf64_exp2n (vint64m1_t e)  ///< exponent vector (2x vint64m1_t).
  */
 static inline svfloat64_t
 jbm_2xf64_ldexp (const svfloat64_t x,   ///< svfloat64_t vector.
-                 vint64m1_t e)  ///< exponent vector (vint64m1_t).
+                 svint64_t e)  ///< exponent vector (svint64_t).
 {
   return jbm_nxf64_ldexp (svptrue_pat_b64 (SV_VL2), x, e);
 }
@@ -31609,7 +31608,7 @@ jbm_8xf32_copysign (const svfloat32_t x,
                     const svfloat32_t y)
                     ///< svfloat32_t vector to preserve sign.
 {
-  return jbm_nxf32_copysign (svptrue_pat_b32 (SV_VL8), x, y);
+  return jbm_nxf32_copysign (x, y);
 }
 
 /**
@@ -31627,9 +31626,9 @@ jbm_8xf32_hypot (const svfloat32_t x,   ///< 1st svfloat32_t vector.
 /**
  * Function to rounding to nearest (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_8xf32_round (const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_round (svptrue_pat_b32 (SV_VL8), x);
@@ -31638,9 +31637,9 @@ jbm_8xf32_round (const svfloat32_t x)   ///< svfloat32_t vector.
 /**
  * Function to rounding towards zero (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_trunc_8xf32 (const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_trunc (svptrue_pat_b32 (SV_VL8), x);
@@ -31649,9 +31648,9 @@ jbm_trunc_8xf32 (const svfloat32_t x)   ///< svfloat32_t vector.
 /**
  * Function to rounding down (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_8xf32_floor (const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_floor (svptrue_pat_b32 (SV_VL8), x);
@@ -31660,9 +31659,9 @@ jbm_8xf32_floor (const svfloat32_t x)   ///< svfloat32_t vector.
 /**
  * Function to rounding top (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_8xf32_ceil (const svfloat32_t x)    ///< svfloat32_t vector.
 {
   return jbm_nxf32_floor (svptrue_pat_b32 (SV_VL8), x);
@@ -31687,19 +31686,19 @@ jbm_8xf32_mod (const svfloat32_t x,     ///< dividend (svfloat32_t).
  */
 static inline svfloat32_t
 jbm_8xf32_frexp (const svfloat32_t x,   ///< svfloat32_t vector.
-                 vint32m1_t *e) ///< pointer to the extracted exponents vector.
+                 svint32_t *e) ///< pointer to the extracted exponents vector.
 {
   return jbm_nxf32_frexp (svptrue_pat_b32 (SV_VL8), x, e);
 }
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (8x vint32m1_t).
+ * (8x svint32_t).
  *
  * \return function value (8x svfloat32_t).
  */
 static inline svfloat32_t
-jbm_8xf32_exp2n (vint32m1_t e)  ///< exponent vector (8x vint32m1_t).
+jbm_8xf32_exp2n (svint32_t e)  ///< exponent vector (8x svint32_t).
 {
   return jbm_nxf32_exp2n (svptrue_pat_b32 (SV_VL8), e);
 }
@@ -31711,7 +31710,7 @@ jbm_8xf32_exp2n (vint32m1_t e)  ///< exponent vector (8x vint32m1_t).
  */
 static inline svfloat32_t
 jbm_8xf32_ldexp (const svfloat32_t x,   ///< svfloat32_t vector.
-                 vint32m1_t e)  ///< exponent vector (vint32m1_t).
+                 svint32_t e)  ///< exponent vector (svint32_t).
 {
   return jbm_nxf32_ldexp (svptrue_pat_b32 (SV_VL8), x, e);
 }
@@ -38225,7 +38224,7 @@ jbm_4xf64_copysign (const svfloat64_t x,
                     const svfloat64_t y)
                     ///< svfloat64_t vector to preserve sign.
 {
-  return jbm_nxf64_copysign (svptrue_pat_b64 (SV_VL4), x, y);
+  return jbm_nxf64_copysign (x, y);
 }
 
 /**
@@ -38243,9 +38242,9 @@ jbm_4xf64_hypot (const svfloat64_t x,   ///< 1st svfloat64_t vector.
 /**
  * Function to rounding to nearest (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_4xf64_round (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_round (svptrue_pat_b64 (SV_VL4), x);
@@ -38254,9 +38253,9 @@ jbm_4xf64_round (const svfloat64_t x)   ///< svfloat64_t vector.
 /**
  * Function to rounding towards zero (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_4xf64_trunc (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_trunc (svptrue_pat_b64 (SV_VL4), x);
@@ -38265,9 +38264,9 @@ jbm_4xf64_trunc (const svfloat64_t x)   ///< svfloat64_t vector.
 /**
  * Function to rounding down (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_4xf64_floor (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_floor (svptrue_pat_b64 (SV_VL4), x);
@@ -38276,9 +38275,9 @@ jbm_4xf64_floor (const svfloat64_t x)   ///< svfloat64_t vector.
 /**
  * Function to rounding top (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_4xf64_ceil (const svfloat64_t x)    ///< svfloat64_t vector.
 {
   return jbm_nxf64_floor (svptrue_pat_b64 (SV_VL4), x);
@@ -38303,19 +38302,19 @@ jbm_4xf64_mod (const svfloat64_t x,     ///< dividend (svfloat64_t).
  */
 static inline svfloat64_t
 jbm_4xf64_frexp (const svfloat64_t x,   ///< svfloat64_t vector.
-                 vint64m1_t *e) ///< pointer to the extracted exponents vector.
+                 svint64_t *e) ///< pointer to the extracted exponents vector.
 {
   return jbm_nxf64_frexp (svptrue_pat_b64 (SV_VL4), x, e);
 }
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (4x vint64m1_t).
+ * (4x svint64_t).
  *
  * \return function value (4x svfloat64_t).
  */
 static inline svfloat64_t
-jbm_4xf64_exp2n (vint64m1_t e)  ///< exponent vector (4x vint64m1_t).
+jbm_4xf64_exp2n (svint64_t e)  ///< exponent vector (4x svint64_t).
 {
   return jbm_nxf64_exp2n (e, 4);
 }
@@ -38327,7 +38326,7 @@ jbm_4xf64_exp2n (vint64m1_t e)  ///< exponent vector (4x vint64m1_t).
  */
 static inline svfloat64_t
 jbm_4xf64_ldexp (const svfloat64_t x,   ///< svfloat64_t vector.
-                 vint64m1_t e)  ///< exponent vector (vint64m1_t).
+                 svint64_t e)  ///< exponent vector (svint64_t).
 {
   return jbm_nxf64_ldexp (svptrue_pat_b64 (SV_VL4), x, e);
 }
@@ -44841,7 +44840,7 @@ jbm_16xf32_copysign (const svfloat32_t x,
                      const svfloat32_t y)
                     ///< svfloat32_t vector to preserve sign.
 {
-  return jbm_nxf32_copysign (svptrue_pat_b32 (SV_VL16), x, y);
+  return jbm_nxf32_copysign (x, y);
 }
 
 /**
@@ -44859,9 +44858,9 @@ jbm_16xf32_hypot (const svfloat32_t x,  ///< 1st svfloat32_t vector.
 /**
  * Function to rounding to nearest (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_16xf32_round (const svfloat32_t x)  ///< svfloat32_t vector.
 {
   return jbm_nxf32_round (svptrue_pat_b32 (SV_VL16), x);
@@ -44870,9 +44869,9 @@ jbm_16xf32_round (const svfloat32_t x)  ///< svfloat32_t vector.
 /**
  * Function to rounding towards zero (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_trunc_16xf32 (const svfloat32_t x)  ///< svfloat32_t vector.
 {
   return jbm_nxf32_trunc (svptrue_pat_b32 (SV_VL16), x);
@@ -44881,9 +44880,9 @@ jbm_trunc_16xf32 (const svfloat32_t x)  ///< svfloat32_t vector.
 /**
  * Function to rounding down (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_16xf32_floor (const svfloat32_t x)  ///< svfloat32_t vector.
 {
   return jbm_nxf32_floor (svptrue_pat_b32 (SV_VL16), x);
@@ -44892,9 +44891,9 @@ jbm_16xf32_floor (const svfloat32_t x)  ///< svfloat32_t vector.
 /**
  * Function to rounding top (svfloat32_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (svint32_t).
  */
-static inline vint32m1_t
+static inline svint32_t
 jbm_16xf32_ceil (const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_floor (svptrue_pat_b32 (SV_VL16), x);
@@ -44919,7 +44918,7 @@ jbm_16xf32_mod (const svfloat32_t x,    ///< dividend (svfloat32_t).
  */
 static inline svfloat32_t
 jbm_16xf32_frexp (const svfloat32_t x,  ///< svfloat32_t vector.
-                  vint32m1_t *e)
+                  svint32_t *e)
                   ///< pointer to the extracted exponents vector.
 {
   return jbm_nxf32_frexp (svptrue_pat_b32 (SV_VL16), x, e);
@@ -44927,12 +44926,12 @@ jbm_16xf32_frexp (const svfloat32_t x,  ///< svfloat32_t vector.
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (16x vint32m1_t).
+ * (16x svint32_t).
  *
  * \return function value (16x svfloat32_t).
  */
 static inline svfloat32_t
-jbm_16xf32_exp2n (vint32m1_t e) ///< exponent vector (16x vint32m1_t).
+jbm_16xf32_exp2n (svint32_t e) ///< exponent vector (16x svint32_t).
 {
   return jbm_nxf32_exp2n (svptrue_pat_b32 (SV_VL16), e);
 }
@@ -44944,7 +44943,7 @@ jbm_16xf32_exp2n (vint32m1_t e) ///< exponent vector (16x vint32m1_t).
  */
 static inline svfloat32_t
 jbm_16xf32_ldexp (const svfloat32_t x,  ///< svfloat32_t vector.
-                  vint32m1_t e) ///< exponent vector (vint32m1_t).
+                  svint32_t e) ///< exponent vector (svint32_t).
 {
   return jbm_nxf32_ldexp (svptrue_pat_b32 (SV_VL16), x, e);
 }
@@ -51459,7 +51458,7 @@ jbm_8xf64_copysign (const svfloat64_t x,
                     const svfloat64_t y)
                     ///< svfloat64_t vector to preserve sign.
 {
-  return jbm_nxf64_copysign (svptrue_pat_b64 (SV_VL8), x, y);
+  return jbm_nxf64_copysign (x, y);
 }
 
 /**
@@ -51477,9 +51476,9 @@ jbm_8xf64_hypot (const svfloat64_t x,   ///< 1st svfloat64_t vector.
 /**
  * Function to rounding to nearest (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_8xf64_round (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_round (svptrue_pat_b64 (SV_VL8), x);
@@ -51488,9 +51487,9 @@ jbm_8xf64_round (const svfloat64_t x)   ///< svfloat64_t vector.
 /**
  * Function to rounding towards zero (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_trunc_8xf64 (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_trunc (svptrue_pat_b64 (SV_VL8), x);
@@ -51499,9 +51498,9 @@ jbm_trunc_8xf64 (const svfloat64_t x)   ///< svfloat64_t vector.
 /**
  * Function to rounding down (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_8xf64_floor (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_floor (svptrue_pat_b64 (SV_VL8), x);
@@ -51510,9 +51509,9 @@ jbm_8xf64_floor (const svfloat64_t x)   ///< svfloat64_t vector.
 /**
  * Function to rounding top (svfloat64_t).
  *
- * \return function value vector (vint64m1_t).
+ * \return function value vector (svint64_t).
  */
-static inline vint64m1_t
+static inline svint64_t
 jbm_8xf64_ceil (const svfloat64_t x)    ///< svfloat64_t vector.
 {
   return jbm_nxf64_floor (svptrue_pat_b64 (SV_VL8), x);
@@ -51537,19 +51536,19 @@ jbm_8xf64_mod (const svfloat64_t x,     ///< dividend (svfloat64_t).
  */
 static inline svfloat64_t
 jbm_8xf64_frexp (const svfloat64_t x,   ///< svfloat64_t vector.
-                 vint64m1_t *e) ///< pointer to the extracted exponents vector.
+                 svint64_t *e) ///< pointer to the extracted exponents vector.
 {
   return jbm_nxf64_frexp (svptrue_pat_b64 (SV_VL8), x, e);
 }
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (8x vint64m1_t).
+ * (8x svint64_t).
  *
  * \return function value (8x svfloat64_t).
  */
 static inline svfloat64_t
-jbm_8xf64_exp2n (vint64m1_t e)  ///< exponent vector (8x vint64m1_t).
+jbm_8xf64_exp2n (svint64_t e)  ///< exponent vector (8x svint64_t).
 {
   return jbm_nxf64_exp2n (svptrue_pat_b64 (SV_VL8), e);
 }
@@ -51561,7 +51560,7 @@ jbm_8xf64_exp2n (vint64m1_t e)  ///< exponent vector (8x vint64m1_t).
  */
 static inline svfloat64_t
 jbm_8xf64_ldexp (const svfloat64_t x,   ///< svfloat64_t vector.
-                 vint64m1_t e)  ///< exponent vector (vint64m1_t).
+                 svint64_t e)  ///< exponent vector (svint64_t).
 {
   return jbm_nxf64_ldexp (svptrue_pat_b64 (SV_VL8), x, e);
 }
