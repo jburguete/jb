@@ -293,7 +293,7 @@ typedef union
     xr[i] = op (x1[i], x2[i]);
 
 ///> macro to automatize operations on two arrays and one number.
-#define JBM_ARRAY_OP3(xr, x1, x2, x3, n, type512, type256, type128, type, \
+#define JBM_ARRAY_OP21(xr, x1, x2, x3, n, type512, type256, type128, type, \
                       load512, load256, load128, store512, store256, store128, \
                       set512, set256, set128, op512, op256, op128, op) \
   const type512 x512 = set512 (x2); \
@@ -337,7 +337,7 @@ typedef union
     xr[i] = op (x1[i], x2, x3[i]);
 
 ///> macro to automatize operations on three arrays.
-#define JBM_ARRAY_OP4(xr, x1, x2, x3, n, type, load512, load256, load128, \
+#define JBM_ARRAY_OP3(xr, x1, x2, x3, n, type, load512, load256, load128, \
                       store512, store256, store128, op512, op256, op128, op) \
   unsigned int i, j; \
   for (i = 0, j = n >> (4 + 8 / sizeof (type)); j > 0; --j) \
@@ -16511,8 +16511,8 @@ jbm_8xf64_integral (__m512d (*f) (__m512d),
  * Function to set a float array with another float array.
  */
 static inline void
-jbm_array_f32_set (float *restrict xr,  ///< result float array.
-                   const float *restrict xd,    ///< data float array.
+jbm_array_f32_set (float *xr,   ///< result float array.
+                   const float *xd,     ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_SET (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
@@ -17244,11 +17244,11 @@ jbm_array_f32_fmadd1 (float *xr,        ///< result float array.
                       const float *x3,  ///< addend float array.
                       const unsigned int n)     ///< number of array elements.
 {
-  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m512, __m256, __m128, float,
-                 _mm512_loadu_ps, _mm256_loadu_ps, _mm_loadu_ps,
-                 _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
-                 _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
-                 _mm512_fmadd_ps, _mm256_fmadd_ps, _mm_fmadd_ps, fmaf);
+  JBM_ARRAY_OP21 (xr, x1, x2, x3, n, __m512, __m256, __m128, float,
+                  _mm512_loadu_ps, _mm256_loadu_ps, _mm_loadu_ps,
+                  _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
+                  _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
+                  _mm512_fmadd_ps, _mm256_fmadd_ps, _mm_fmadd_ps, fmaf);
 }
 
 /**
@@ -17262,11 +17262,11 @@ jbm_array_f32_fnmadd1 (float *xr,       ///< result float array.
                        const float *x3, ///< addend float array.
                        const unsigned int n)    ///< number of array elements.
 {
-  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m512, __m256, __m128, float,
-                 _mm512_loadu_ps, _mm256_loadu_ps, _mm_loadu_ps,
-                 _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
-                 _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps, _mm512_fnmadd_ps,
-                 _mm256_fnmadd_ps, _mm_fnmadd_ps, jbm_f32_fnmadd);
+  JBM_ARRAY_OP21 (xr, x1, x2, x3, n, __m512, __m256, __m128, float,
+                  _mm512_loadu_ps, _mm256_loadu_ps, _mm_loadu_ps,
+                  _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
+                  _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps, _mm512_fnmadd_ps,
+                  _mm256_fnmadd_ps, _mm_fnmadd_ps, jbm_f32_fnmadd);
 }
 
 /**
@@ -17280,11 +17280,11 @@ jbm_array_f32_fmsub1 (float *xr,        ///< result float array.
                       const float *x3,  ///< subtrahend float array.
                       const unsigned int n)     ///< number of array elements.
 {
-  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m512, __m256, __m128, float,
-                 _mm512_loadu_ps, _mm256_loadu_ps, _mm_loadu_ps,
-                 _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
-                 _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps, _mm512_fmsub_ps,
-                 _mm256_fmsub_ps, _mm_fmsub_ps, jbm_f32_fmsub);
+  JBM_ARRAY_OP21 (xr, x1, x2, x3, n, __m512, __m256, __m128, float,
+                  _mm512_loadu_ps, _mm256_loadu_ps, _mm_loadu_ps,
+                  _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
+                  _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps, _mm512_fmsub_ps,
+                  _mm256_fmsub_ps, _mm_fmsub_ps, jbm_f32_fmsub);
 }
 
 /**
@@ -17298,11 +17298,11 @@ jbm_array_f32_fnmsub1 (float *xr,       ///< result float array.
                        const float *x3, ///< subtrahend float array.
                        const unsigned int n)    ///< number of array elements.
 {
-  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m512, __m256, __m128, float,
-                 _mm512_loadu_ps, _mm256_loadu_ps, _mm_loadu_ps,
-                 _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
-                 _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps, _mm512_fnmsub_ps,
-                 _mm256_fnmsub_ps, _mm_fnmsub_ps, jbm_f32_fnmsub);
+  JBM_ARRAY_OP21 (xr, x1, x2, x3, n, __m512, __m256, __m128, float,
+                  _mm512_loadu_ps, _mm256_loadu_ps, _mm_loadu_ps,
+                  _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
+                  _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps, _mm512_fnmsub_ps,
+                  _mm256_fnmsub_ps, _mm_fnmsub_ps, jbm_f32_fnmsub);
 }
 
 /**
@@ -17316,7 +17316,7 @@ jbm_array_f32_fmadd (float *xr, ///< result float array.
                      const float *x3,   ///< addend float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
                  _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
                  _mm_storeu_ps, _mm512_fmadd_ps, _mm256_fmadd_ps, _mm_fmadd_ps,
                  fmaf);
@@ -17333,7 +17333,7 @@ jbm_array_f32_fnmadd (float *xr,        ///< result float array.
                       const float *x3,  ///< addend float array.
                       const unsigned int n)     ///< number of array elements.
 {
-  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
                  _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
                  _mm_storeu_ps, _mm512_fnmadd_ps, _mm256_fnmadd_ps,
                  _mm_fnmadd_ps, jbm_f32_fnmadd);
@@ -17350,7 +17350,7 @@ jbm_array_f32_fmsub (float *xr, ///< result float array.
                      const float *x3,   ///< subtrahend float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
                  _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
                  _mm_storeu_ps, _mm512_fmsub_ps, _mm256_fmsub_ps, _mm_fmsub_ps,
                  jbm_f32_fmsub);
@@ -17367,7 +17367,7 @@ jbm_array_f32_fnmsub (float *xr,        ///< result float array.
                       const float *x3,  ///< subtrahend float array.
                       const unsigned int n)     ///< number of array elements.
 {
-  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
                  _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
                  _mm_storeu_ps, _mm512_fnmsub_ps, _mm256_fnmsub_ps,
                  _mm_fnmsub_ps, jbm_f32_fnmsub);
@@ -17504,8 +17504,8 @@ jbm_array_f32_regression_linear (const float *x,
  * Function to set a double array with another double array.
  */
 static inline void
-jbm_array_f64_set (double *restrict xr, ///< result double array.
-                   const double *restrict xd,   ///< data double array.
+jbm_array_f64_set (double *xr,  ///< result double array.
+                   const double *xd,    ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_SET (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
@@ -18238,11 +18238,11 @@ jbm_array_f64_fmadd1 (double *xr,       ///< result double array.
                       const double *x3, ///< addend double array.
                       const unsigned int n)     ///< number of array elements.
 {
-  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m512d, __m256d, __m128d, double,
-                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
-                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
-                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd,
-                 _mm512_fmadd_pd, _mm256_fmadd_pd, _mm_fmadd_pd, fma);
+  JBM_ARRAY_OP21 (xr, x1, x2, x3, n, __m512d, __m256d, __m128d, double,
+                  _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                  _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                  _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd,
+                  _mm512_fmadd_pd, _mm256_fmadd_pd, _mm_fmadd_pd, fma);
 }
 
 /**
@@ -18257,11 +18257,11 @@ jbm_array_f64_fnmadd1 (double *xr,      ///< result double array.
                        const double *x3,        ///< addend double array.
                        const unsigned int n)    ///< number of array elements.
 {
-  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m512d, __m256d, __m128d, double,
-                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
-                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
-                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_fnmadd_pd,
-                 _mm256_fnmadd_pd, _mm_fnmadd_pd, jbm_f64_fnmadd);
+  JBM_ARRAY_OP21 (xr, x1, x2, x3, n, __m512d, __m256d, __m128d, double,
+                  _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                  _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                  _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_fnmadd_pd,
+                  _mm256_fnmadd_pd, _mm_fnmadd_pd, jbm_f64_fnmadd);
 }
 
 /**
@@ -18275,11 +18275,11 @@ jbm_array_f64_fmsub1 (double *xr,       ///< result double array.
                       const double *x3, ///< subtrahend double array.
                       const unsigned int n)     ///< number of array elements.
 {
-  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m512d, __m256d, __m128d, double,
-                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
-                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
-                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_fmsub_pd,
-                 _mm256_fmsub_pd, _mm_fmsub_pd, jbm_f64_fmsub);
+  JBM_ARRAY_OP21 (xr, x1, x2, x3, n, __m512d, __m256d, __m128d, double,
+                  _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                  _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                  _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_fmsub_pd,
+                  _mm256_fmsub_pd, _mm_fmsub_pd, jbm_f64_fmsub);
 }
 
 /**
@@ -18294,11 +18294,11 @@ jbm_array_f64_fnmsub1 (double *xr,      ///< result double array.
                        const double *x3,        ///< subtrahend double array.
                        const unsigned int n)    ///< number of array elements.
 {
-  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m512d, __m256d, __m128d, double,
-                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
-                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
-                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_fnmsub_pd,
-                 _mm256_fnmsub_pd, _mm_fnmsub_pd, jbm_f64_fnmsub);
+  JBM_ARRAY_OP21 (xr, x1, x2, x3, n, __m512d, __m256d, __m128d, double,
+                  _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                  _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                  _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_fnmsub_pd,
+                  _mm256_fnmsub_pd, _mm_fnmsub_pd, jbm_f64_fnmsub);
 }
 
 /**
@@ -18312,7 +18312,7 @@ jbm_array_f64_fmadd (double *xr,        ///< result double array.
                      const double *x3,  ///< addend double array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
                  _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
                  _mm_storeu_pd, _mm512_fmadd_pd, _mm256_fmadd_pd, _mm_fmadd_pd,
                  fma);
@@ -18329,7 +18329,7 @@ jbm_array_f64_fnmadd (double *xr,       ///< result double array.
                       const double *x3, ///< addend double array.
                       const unsigned int n)     ///< number of array elements.
 {
-  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
                  _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
                  _mm_storeu_pd, _mm512_fnmadd_pd, _mm256_fnmadd_pd,
                  _mm_fnmadd_pd, jbm_f64_fnmadd);
@@ -18346,7 +18346,7 @@ jbm_array_f64_fmsub (double *xr,        ///< result double array.
                      const double *x3,  ///< subtrahend double array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
                  _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
                  _mm_storeu_pd, _mm512_fmsub_pd, _mm256_fmsub_pd, _mm_fmsub_pd,
                  jbm_f64_fmsub);
@@ -18363,7 +18363,7 @@ jbm_array_f64_fnmsub (double *xr,       ///< result double array.
                       const double *x3, ///< subtrahend double array.
                       const unsigned int n)     ///< number of array elements.
 {
-  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
                  _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
                  _mm_storeu_pd, _mm512_fnmsub_pd, _mm256_fnmsub_pd,
                  _mm_fnmsub_pd, jbm_f64_fnmsub);

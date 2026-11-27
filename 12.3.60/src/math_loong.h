@@ -275,7 +275,7 @@ static inline __m128
 __lsx_vfscaleb_s (const __m128 x, const __m128i e)
 {
   __m128 r;
-  __asm__ ("vfscaleb.s %w0, %w1, %w2" : "=f" (r) : "f" (x), "f" (e));
+__asm__ ("vfscaleb.s %w0, %w1, %w2": "=f" (r):"f" (x), "f" (e));
   return r;
 }
 
@@ -283,7 +283,7 @@ static inline __m128d
 __lsx_vfscaleb_d (const __m128d x, const __m128i e)
 {
   __m128d r;
-  __asm__ ("vfscaleb.d %w0, %w1, %w2" : "=f" (r) : "f" (x), "f" (e));
+__asm__ ("vfscaleb.d %w0, %w1, %w2": "=f" (r):"f" (x), "f" (e));
   return r;
 }
 
@@ -295,7 +295,7 @@ static inline __m256
 __lasx_xvfscaleb_s (const __m256 x, const __m256i e)
 {
   __m256 r;
-  __asm__ ("xvfscaleb.s %u0, %u1, %u2" : "=f" (r) : "f" (x), "f" (e));
+__asm__ ("xvfscaleb.s %u0, %u1, %u2": "=f" (r):"f" (x), "f" (e));
   return r;
 }
 
@@ -303,7 +303,7 @@ static inline __m256d
 __lasx_xvfscaleb_d (const __m256d x, const __m256i e)
 {
   __m256d r;
-  __asm__ ("xvfscaleb.d %u0, %u1, %u2" : "=f" (r) : "f" (x), "f" (e));
+__asm__ ("xvfscaleb.d %u0, %u1, %u2": "=f" (r):"f" (x), "f" (e));
   return r;
 }
 
